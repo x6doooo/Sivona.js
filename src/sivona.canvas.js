@@ -1,9 +1,9 @@
-var Canvas = function(container_id, w, h){
+Canvas = function(container_id, w, h){
   var self = this,
     ct,
     cn;
   if(isUndefined(container_id) || !isString(container_id)){
-    throw new Error(ERROR_STRING.container);
+    throw new Error(ERROR_STR.container);
   }
   if(isUndefined(w)){
     w = window.screen.width;
@@ -13,7 +13,7 @@ var Canvas = function(container_id, w, h){
   }
   ct = document.getElementById(container_id);
   if(ct === null){
-    throw new Error(ERROR_STRING.container);
+    throw new Error(ERROR_STR.container);
   }
   cn = document.createElement('canvas');
   cn.width = w;
