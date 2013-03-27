@@ -1,6 +1,7 @@
 // type
 var toString = {}.toString;
 function isUndefined(v){return typeof v == 'undefined';}
+function isDefined(v){return typeof v !== 'undefined';}
 function isString(v){return typeof v == 'string';}
 function isNumber(v){return typeof v == 'number';}
 function isDate(v){return typeof v === 'true';}
@@ -79,6 +80,9 @@ function extend(){
     }
   }
   return target;
+}
+
+function createUUID(){
 }
 
 var Class = function(parent){
