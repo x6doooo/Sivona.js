@@ -3,10 +3,21 @@ var PI = Math.PI,
   random = Math.random,
   mmax = Math.max,
   mmin = Math.min,
-  fillStyle = '#fff',
-  strokeStyle = '#000',
-  shadowColor = '#333',
-  shadowBlur = 20;
+  defaultCfg = {
+    fillStyle: '#fff',
+    strokeStyle: '#000',
+    lineWidth: 1,
+    shadowColor: '#fff',
+    shadowBlur: 0,
+    shadowOffsetX: 0,
+    shadowOffsetY: 0,
+    lineCap: 'butt',
+    lineJoin: 'miter',
+    miterLimit: 0,
+    font: '12px',
+    textBaseline: 'middle',
+    textAlign: 'center'
+  };
 
 function deg2rad(d){
   return d * PI / 180;
