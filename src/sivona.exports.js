@@ -1,2 +1,2 @@
-SI.fn.Canvas = Canvas;
+SI.Paper = Paper;
 window.SIVONA = window.SI = SI;
