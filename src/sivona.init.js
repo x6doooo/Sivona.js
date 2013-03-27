@@ -1,4 +1,6 @@
-var SI = {},
-  ERROR_STRING = {
-    'container': 'Container is undefined!'
-  };
+var SI = function(id, w, h){
+    return new SI.fn.Canvas(id, w, h);
+  },
+  Canvas;
+
+SI.fn = SI.prototype;
