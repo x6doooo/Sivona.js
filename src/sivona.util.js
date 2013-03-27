@@ -1,5 +1,4 @@
 // type
-
 var toString = {}.toString;
 function isUndefined(v){return typeof v == 'undefined';}
 function isString(v){return typeof v == 'string';}
@@ -81,4 +80,37 @@ function extend(){
   }
   return target;
 }
+
+var Class = function(parent){
+  var _class = function(){
+      this.init.apply(this,arguments);
+    },
+    key,
+    subclass;
+  _class.prototype.init = function(){};
+  if(parent){
+    subclass = function(){};
+    subclass.prototype = parent.prototype;
+    _class.uber = parent.prototype;
+    _class.prototype = new subclass;
+  }
+  _class.extend = function(obj){
+    for(key in obj){
+      _class[key] = obj[key];
+    }
+  };
+  _class.include = function(obj){
+    for(key in obj){
+      _class.prototype[key] = obj[key];
+      if(_class.uber && isFunction(_class.uber[key])){
+        obj[key].spfunc = _class.uber[key];
+      }
+    }
+  };
+  _class.prototype.supr = function(){
+    arguments.callee.caller.spfunc.apply(this, arguments);
+  };
+  return _class;
+};
+
 
