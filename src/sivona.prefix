@@ -1,1 +1,8 @@
+/*
+ * GeoMap v0.2
+ * https://github.com/x6doooo/Sivona.js
+ *
+ * Copyright 2013 Dx. Yang
+ * Released under the MIT license
+ */
 (function(window, undefined){
