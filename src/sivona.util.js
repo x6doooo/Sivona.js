@@ -19,7 +19,7 @@ function isEmptyObject(v){
 function to_i(v){return parseInt(v, 10);}
 function to_f(v){return parseFloat(v);}
 function to_s(v){return v + ''};
-function to_a(obj){return [].slice.call(obj, 0)};
+function to_a(obj){return [].slice.call(obj, 0);}
 function toFixed(nu, pos){
   return to_f(nu.toFixed(pos));
 }
@@ -64,15 +64,17 @@ function extend(){
   for( ;i < len; i++ ){
     ops = args[i];
     for (name in ops) {
+      console.log(ops);
       src = target[name];
       copy = ops[name];
       if (target === ops[name]) continue;
-      if (deep && copy && src){
+      if (deep && copy && src && typeof copy == 'Object'){
         if(isArray(copy)){
           clone = isArray(src) ? src : [];
         }else{
           clone = isEmptyObject(src) ? {} : src;
         }
+        console.log(copy);
         target[name] = extend(deep, clone, copy);
       }else{
         target[name] = ops[name];
@@ -80,9 +82,6 @@ function extend(){
     }
   }
   return target;
-}
-
-function createUUID(){
 }
 
 /*!
