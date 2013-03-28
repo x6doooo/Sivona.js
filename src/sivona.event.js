@@ -25,8 +25,6 @@ EvArray.include({
       els = self.els,
       el = whichs[whichs.length-1];
     els.forEach(function(v, i, a){
-      console.log(v);
-      console.log(el);
       if(v.target == el){
         v.handle.call(v.target);
       }
