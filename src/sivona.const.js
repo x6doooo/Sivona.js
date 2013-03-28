@@ -4,7 +4,7 @@ var PI = Math.PI,
   mmax = Math.max,
   mmin = Math.min,
   defaultCfg = {
-    fillStyle: '#fff',
+    fillStyle: '#ccc',
     strokeStyle: '#000',
     lineWidth: 1,
     shadowColor: '#fff',

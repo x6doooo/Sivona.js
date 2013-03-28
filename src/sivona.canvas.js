@@ -46,20 +46,48 @@ Paper.include({
     }
     ctxt.clearRect(l, t, w, h);
   },
+  initShape: function(el){
+    var self = this,
+      els = self.allElements;
+    el.context = self.canvasContext;
+    el.display = true;
+    el.zIndex = els.length;
+    els.push(el);
+    return el;
+  },
   rect: function(l, t, w, h){
     var self = this,
-      allElements = self.allElements,
       el = new Crect({
-        context: self.canvasContext,
-        display: true,
-        zIndex: allElements.length,
         left: l,
         top: t,
         width: w,
         height: h
       });
-    allElements.push(el);
-    return el;
+    return self.initShape(el);
+  },
+  arc: function(x, y, r, sAngle, eAngle, counterclockwise){
+    var self = this,
+      el = new Carc({
+        x: x,
+        y: y,
+        r: r,
+        sAngle: sAngle * PI,
+        eAngle: eAngle * PI,
+        counterclockwise: counterclockwise
+      });
+    return self.initShape(el);
+  },
+  circle: function(x, y, r){
+    var self = this,
+      el = new Carc({
+        x: x,
+        y: y,
+        r: r,
+        sAngle: 0,
+        eAngle: 2 * PI,
+        counterclockwise: false
+      });
+    return self.initShape(el);
   },
   render: function(){
     var self = this,
@@ -101,23 +129,35 @@ Celement.include({
   render: function(){
     var self = this,
       cfg = self.cfg,
-      ctxt = self.context;
+      ctx = self.context;
     forEach(cfg, function(v, k){
-      ctxt[k] = v;
+      ctx[k] = v;
     });
+    ctx.beginPath();
+    self.draw();
+    //ctx.lineWidth不能赋予0或其他非数字
+    //so 不画边框 就根据cfg来判断
+    if(cfg.lineWidth != 0){
+      ctx.stroke();
+    }
+    if(cfg.fillStyle != 'none'){
+      ctx.fill();
+    }
   }
 });
 
 Crect = new Class(Celement);
 Crect.include({
-  render: function(){
-    this.supr();
-    var self = this,
-      cfg = self.cfg,
-      ctxt = self.context;
-    ctxt.beginPath();
-    ctxt.rect(self.left, self.top, self.width, self.height);
-    ctxt.fill();
-    ctxt.stroke();
+  draw: function(){
+    var self = this;
+    self.context.rect(self.left, self.top, self.width, self.height);
+  }
+});
+
+Carc = new Class(Celement);
+Carc.include({
+  draw: function(){
+    var self = this;
+    self.context.arc(self.x, self.y, self.r, self.sAngle, self.eAngle, self.counterclockwise);
   }
 });
