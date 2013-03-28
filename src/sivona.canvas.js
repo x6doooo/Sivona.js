@@ -52,7 +52,7 @@ Paper.include({
     el.context = self.canvasContext;
     el.display = true;
     el.zIndex = els.length;
-    el.closeit = false;
+    el.closeit = true;
     els.push(el);
     return el;
   },
@@ -87,6 +87,13 @@ Paper.include({
         sAngle: 0,
         eAngle: 2 * PI,
         counterclockwise: false
+      });
+    return self.initShape(el);
+  },
+  ellipse: function(x, y, xr, yr){
+    var self = this,
+      el = new Cellipse({
+        x: x, y: y, xr: xr, yr: yr
       });
     return self.initShape(el);
   },
@@ -168,5 +175,33 @@ Carc.include({
   draw: function(){
     var self = this;
     self.context.arc(self.x, self.y, self.r, self.sAngle, self.eAngle, self.counterclockwise);
+    self.closeit = false;
+  }
+});
+
+Cellipse = new Class(Celement);
+Cellipse.include({
+  draw: function(){
+    var self = this,
+      ctx = self.context,
+      kappa = .5522848,
+      x = self.x,
+      y = self.y,
+      xr = self.xr,
+      yr = self.yr,
+      ox = xr * kappa,
+      oy = yr * kappa,
+      xe = x + xr * 2,
+      ye = y + yr * 2,
+      xm = x + xr,
+      ym = y + yr;
+    ctx.beginPath();
+    ctx.moveTo(x, ym);
+    ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+    ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+    ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+    ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+    ctx.closePath();
+    ctx.stroke();
   }
 });
