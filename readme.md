@@ -11,10 +11,16 @@ canvas绘制类库
 	
 ####SI ( id, width, height )
 	
-@param id: string 画布插入位置
+@Params:
+ - id {String} 画布插入位置
 
-@width: number 画布宽度（可选）
+ - width {Number} 画布宽度（可选）
 
-@height: number 画布高度（可选）
+ - height {Number} 画布高度（可选）
 
-@return 
+@Return: Paper类的实例
+
+@Usage:
+
+	var paper  = SI('div1', 100, 100);
+	paper.rect(10, 10, 20, 20);
