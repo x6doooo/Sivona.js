@@ -1,6 +1,7 @@
 if ARGV.empty?
   src_path = '../src/sivona.'
   tar_path = './si-doc.md'
+  whole_file = '../src/sivona.js'
 end
 
 config = [
@@ -25,8 +26,10 @@ config.each do |path|
   end
 end
 
-puts files.length
 files = files.join
+File.open(whole_file, 'w') do |file|
+  file.write(files);
+end
 
 heads = {
     "@Title" => "#;",
