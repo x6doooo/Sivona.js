@@ -97,6 +97,13 @@ Paper.include({
       });
     return self.initShape(el);
   },
+  path: function(json){
+    var self = this,
+      el = new Cpath({
+        pathJSON: json
+      });
+    return self.initShape(el);
+  },
   render: function(){
     var self = this,
       allElements = self.allElements;
@@ -148,7 +155,6 @@ Celement.include({
     ctx.beginPath();
     self.draw();
     if(self.closeit === true){
-      console.log(self.closeit);
       ctx.closePath();
     }
     //ctx.lineWidth不能赋予0或其他非数字
@@ -195,13 +201,58 @@ Cellipse.include({
       ye = y + yr * 2,
       xm = x + xr,
       ym = y + yr;
-    ctx.beginPath();
     ctx.moveTo(x, ym);
     ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
     ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
     ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
     ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
-    ctx.closePath();
-    ctx.stroke();
+  }
+});
+
+/*!
+    @Name: Path
+    @Info: 路径对象
+    @Type: Class
+    @Usage:
+
+      pathJSON = [
+        {type:'moveTo', points: [x, y]},
+        {type:'lineTo', points: [x, y]},
+        {type:'quadraticCurveTo', points: [x1, y1, x2, y2]},
+        {type:'bezierCurveTo', points: [x1, y1, x2, y2, x3, y3]}
+        {type:'closePath'},
+        {type:'moveTo', points: [x, y]},
+        ...
+      ];
+
+*/
+
+var order2func = {
+  'M': 'moveTo',
+  'L': 'lineTo',
+  'Q': 'quadraticCurveTo',
+  'C': 'bezierCurveTo',
+  'Z': 'closePath'
+};
+
+Cpath = new Class(Celement);
+Cpath.include({
+  draw: function(){
+    var self = this,
+      ctx = self.context,
+      cfg = self.cfg,
+      json = self.pathJSON;
+    json.forEach(function(step, idx, all){
+      ctx[step.type].apply(ctx, step.points)
+      if(step.type == 'closePath'){
+        if(cfg.lineWidth != 0){
+          ctx.stroke();
+        }
+        if(cfg.fillStyle != 'none'){
+          ctx.fill();
+        }
+        ctx.beginPath();
+      }
+    });
   }
 });
