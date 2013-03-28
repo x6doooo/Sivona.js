@@ -1,3 +1,18 @@
+var Paper,
+  Celement,
+  Crect,
+  Carc,
+  Cellipse,
+  Cpath,
+  order2func = {
+    'M': 'moveTo',
+    'L': 'lineTo',
+    'Q': 'quadraticCurveTo',
+    'C': 'bezierCurveTo',
+    'Z': 'closePath'
+  },
+  regodr = /[MLQCZ]/g;
+
 Paper = new Class;
 Paper.include({
   init: function(container_id, w, h){
@@ -30,17 +45,45 @@ Paper.include({
     self.initEveHandler();
     self.reset();
   },
-  eveHandler: function(e){
-  },
+  /*
+      初始化事件处理对象
+      TODO：鼠标进入canvas元素之后，只有mousemove事件。需要根据经过的元素，判断在各元素之间的over和out。
+   */
   initEveHandler: function(){
     var self = this,
-      events = SI.domEvents,
       node = self.canvasNode,
-      eves = {};
+      events = domEvents;
+    self.eves = {};
+    self.hasIn = [];
     events.forEach(function(event){
-      eves[event] = new EvArray(self, event);
-    })
-    self.eves = eves;
+      self.eves[event] = new EvArray(self, event);
+      node.addEventListener(event, function(e){
+        console.log(type);
+        var type = e.type,
+          p = getEventPosition(e),
+          whichs = self.whichHasThisPoint(p),
+          tem = [];
+        if(type == 'mouseover'){
+          self.hasIn = whichs;
+        }
+        if(type == 'mouseout'){
+          whichs = self.hasIn;
+        }
+        if(type == 'mousemove'){
+          whichs.forEach(function(v){
+            if(self.hasIn.indexOf(v) >= 0){
+              tem.push(v);
+            }
+          });
+          if(tem.length > 0){
+            self.eves['mousemove'].handle(tem, e);
+          }
+        }
+        if(whichs.length > 0){
+          self.eves[type].handle(whichs, e);
+        }
+      }, false);
+    });
   },
   reset: function(){
     var self = this,
@@ -63,8 +106,7 @@ Paper.include({
   initShape: function(el){
     var self = this,
       els = self.allElements,
-      eves = self.eves,
-      domEvents = SI.domEvents;
+      eves = self.eves;
     el.paper = self;
     el.context = self.canvasContext;
     el.display = true;
@@ -271,15 +313,6 @@ Cellipse.include({
 });
 
 
-var order2func = {
-  'M': 'moveTo',
-  'L': 'lineTo',
-  'Q': 'quadraticCurveTo',
-  'C': 'bezierCurveTo',
-  'Z': 'closePath'
-};
-
-var regodr = /[MLQCZ]/g;
 
 Cpath = new Class(Celement);
 Cpath.extend({
