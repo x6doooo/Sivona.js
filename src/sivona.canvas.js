@@ -99,9 +99,11 @@ Paper.include({
   },
   path: function(json){
     var self = this,
-      el = new Cpath({
-        pathJSON: json
-      });
+      el = new Cpath({});
+    if(isString(json)){
+      json = Cpath.parse(json);
+    }
+    el.pathJSON = json;
     return self.initShape(el);
   },
   render: function(){
@@ -215,6 +217,8 @@ Cellipse.include({
     @Type: Class
     @Usage:
 
+      pathString = "Mx,yLx,y..."
+
       pathJSON = [
         {type:'moveTo', points: [x, y]},
         {type:'lineTo', points: [x, y]},
@@ -235,7 +239,28 @@ var order2func = {
   'Z': 'closePath'
 };
 
+var regodr = /[MLQCZ]/g;
+
 Cpath = new Class(Celement);
+Cpath.extend({
+  parse: function(str){
+    str = str.replace(/\s/g,'');
+    str = str.replace(regodr, '|$&');
+    str = str.split('|');
+    var arr = [],
+      tem = {},
+      ps = [];
+    str.forEach(function(v, i, a){
+      if(v == '') return;
+      tem = {
+        type: order2func[v.match(regodr)[0]],
+        points: v.replace(regodr,'').split(',')
+      };
+      arr.push(tem)
+    });
+    return arr;
+  }
+});
 Cpath.include({
   draw: function(){
     var self = this,
@@ -254,5 +279,6 @@ Cpath.include({
         ctx.beginPath();
       }
     });
+    self.closeit = false;
   }
 });
