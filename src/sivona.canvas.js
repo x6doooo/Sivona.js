@@ -25,7 +25,7 @@ Paper.include({
     self.container = ct;
     self.canvasNode = cn;
     self.canvasContext = cn.getContext('2d');
-    self.allNodes = [];
+    self.allElements = [];
     self.reset();
   },
   reset: function(){
@@ -48,15 +48,32 @@ Paper.include({
   },
   rect: function(l, t, w, h){
     var self = this,
-      canvasContext = self.canvasContext,
+      allElements = self.allElements,
       el = new Crect({
-        context: canvasContext,
+        context: self.canvasContext,
+        display: true,
+        zIndex: allElements.length,
         left: l,
         top: t,
         width: w,
         height: h
       });
+    allElements.push(el);
     return el;
+  },
+  render: function(){
+    var self = this,
+      allElements = self.allElements;
+    allElements.sort(function(a, b){
+      return a.zIndex - b.zIndex;
+    });
+    allElements.forEach(function(el, idx, all){
+      el.render();
+    });
+  },
+  refresh: function(){
+    this.clear();
+    this.render();
   }
 });
 
@@ -69,12 +86,17 @@ Celement.include({
       self[k] = v;
     })
     self.cfg = {};
-    self.display = false;
   },
   attr: function(cfg){
     var self = this;
     extend(true, self.cfg, cfg);
     return self;
+  },
+  show: function(){
+    this.display = true;
+  },
+  hide: function(){
+    this.display = false;
   },
   render: function(){
     var self = this,
@@ -92,10 +114,10 @@ Crect.include({
     this.supr();
     var self = this,
       cfg = self.cfg,
-      context = self.context;
-    console.log(context);
-    context.rect(self.left, self.top, self.width, self.height);
-    context.fill();
-    context.stroke();
+      ctxt = self.context;
+    ctxt.beginPath();
+    ctxt.rect(self.left, self.top, self.width, self.height);
+    ctxt.fill();
+    ctxt.stroke();
   }
 });
