@@ -1,4 +1,4 @@
-// type
+//type
 var toString = {}.toString;
 function isUndefined(v){return typeof v == 'undefined';}
 function isDefined(v){return typeof v !== 'undefined';}
@@ -10,8 +10,8 @@ function isArray(v){return toString.call(v) == '[object Array]';}
 function isFunction(v){return typeof v == 'function';}
 function isBoolean(v){return v === true || v === false || toString.call(v) == '[object Boolean]';}
 function isEmptyObject(v){
-  var name;
-  for(name in v){
+  var n;
+  for(n in v){
     return false;
   }
   return true;
@@ -24,7 +24,7 @@ function toFixed(nu, pos){
   return to_f(nu.toFixed(pos));
 }
 
-// forEach
+//forEach
 function forEach(obj, iterator, context) {
   var key;
   if (isFunction(obj)){
@@ -85,6 +85,56 @@ function extend(){
 function createUUID(){
 }
 
+/*!
+  Class
+  @Info: OOP封装
+  @Type: Class
+
+  @Params:
+  - parent {contructor} 父类（可选）
+
+  @Return: {Class}
+
+  ***
+
+  Class.extend
+  @Info: 给类增加方法
+  @Type: Method
+  @Params:
+  - {object} 对象内部的属性方法都会追加到类上
+
+  ***
+
+  Class.include
+  @Info: 给原型增加方法
+  @Type: Method
+  @Params:
+  - {object} 对象内部的属性都会追加到圆形上，供实例使用
+
+  ***
+
+  @Usage:
+    //创建父类
+    Dad = new Class;
+    Dad.extend({
+      say: function(){...}  //类方法
+    });
+    Dad.include({
+      init: function(){...} //init方法会在创建实例时自动调用
+      look: function(){...} //原型方法
+    });
+
+    //创建子类，子类继承父类
+    Son = new Class(Dad);
+    Son.inlcude({
+      look: function(){ //覆盖父类的方法
+        this.supr();  //调用父类的同名方法 和其他语言的super功能相似
+        ...
+      }
+    });
+    tom = new Son;  //创建实例
+
+*/
 var Class = function(parent){
   var _class = function(){
       this.init.apply(this,arguments);
@@ -110,6 +160,13 @@ var Class = function(parent){
         obj[key].spfunc = _class.uber[key];
       }
     }
+  };
+  _class.prototype.get = function(k){
+    return this[k];
+  };
+  _class.prototype.set = function(k, v){
+    this[k] = v;
+    return this;
   };
   _class.prototype.supr = function(){
     arguments.callee.caller.spfunc.apply(this, arguments);

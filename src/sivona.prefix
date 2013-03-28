@@ -1,8 +1,9 @@
-/*
- * GeoMap v0.2
- * https://github.com/x6doooo/Sivona.js
- *
- * Copyright 2013 Dx. Yang
- * Released under the MIT license
- */
+/*!
+
+  @Ttile: GeoMap v0.2
+  @Link: https://github.com/x6doooo/Sivona.js
+  @Copyright: Copyright 2013 Dx. Yang
+  @License: Released under the MIT license
+
+*/
 (function(window, undefined){

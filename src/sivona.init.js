@@ -1,8 +1,22 @@
-var SI = function(id, w, h){
+var Version = 0.01,
+  /*!
+    @Name: SI
+    @Info: Sivona.js的命名空间，以及新画布的构造函数
+    @Type: Namespace & Method
+    @Params:
+    * id {string} 画布插入位置
+    * w {number} 画布宽度（可选 默认为浏览器窗口宽度）
+    * h {number} 画布高度（可选 默认为浏览器窗口高度）
+    @Return:
+    - {instance} Paper对象的实例
+    @Usage:
+      var paper = SI('div1', 100, 200);
+      paper.rect(...);
+  */
+  SI = function(id, w, h){
     return new SI.Paper(id, w, h);
   },
   Paper,
   Celement,
   Crect;
 
-SI.version = '0.01';
