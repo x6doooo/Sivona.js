@@ -18,6 +18,7 @@ Paper.include({
       throw new Error('container is not defined!');
     }
     cn = document.createElement('canvas');
+    cn.style.position = 'absolute';
     self.width = cn.width = w;
     self.height = cn.height = h;
     cn.id = 'c1';
@@ -26,7 +27,21 @@ Paper.include({
     self.canvasNode = cn;
     self.canvasContext = cn.getContext('2d');
     self.allElements = [];
+    self.initEveHandler();
     self.reset();
+
+  },
+  eveHandler: function(e){
+  },
+  initEveHandler: function(){
+    var self = this,
+      events = SI.domEvents,
+      node = self.canvasNode,
+      eves = {};
+    events.forEach(function(event){
+      eves[event] = new EvArray(node, event);
+    })
+    self.eves = eves;
   },
   reset: function(){
     var self = this,
@@ -48,11 +63,22 @@ Paper.include({
   },
   initShape: function(el){
     var self = this,
-      els = self.allElements;
+      els = self.allElements,
+      eves = self.eves,
+      domEvents = SI.domEvents;
+    el.paper = self;
     el.context = self.canvasContext;
     el.display = true;
     el.zIndex = els.length;
     el.closeit = true;
+    domEvents.forEach(function(event){
+      el[event] = function(func){
+        eves[event].push({
+          target: el,
+          handle: func
+        });
+      };
+    });
     els.push(el);
     return el;
   },
@@ -97,6 +123,32 @@ Paper.include({
       });
     return self.initShape(el);
   },
+  /*!
+   @Name: path
+   @Info: 路径方法
+   @Type: Method
+   @return: path实例
+   @Usage:
+
+   pathString = "Mx,yLx,y..."
+
+   pathJSON = [
+   {type:'moveTo', points: [x, y]},
+   {type:'lineTo', points: [x, y]},
+   {type:'quadraticCurveTo', points: [x1, y1, x2, y2]},
+   {type:'bezierCurveTo', points: [x1, y1, x2, y2, x3, y3]}
+   {type:'closePath'},
+   {type:'moveTo', points: [x, y]},
+   ...
+   ];
+
+   paper.path(pathString);
+
+   or
+
+   paper.path(pathJSON);
+
+   */
   path: function(json){
     var self = this,
       el = new Cpath({});
@@ -125,8 +177,7 @@ Paper.include({
 Celement = new Class;
 Celement.include({
   init: function(){
-    var self = this,
-      args = to_a(arguments);
+    var self = this;
     forEach(arguments[0], function(v, k){
       self[k] = v;
     })
@@ -211,25 +262,6 @@ Cellipse.include({
   }
 });
 
-/*!
-    @Name: Path
-    @Info: 路径对象
-    @Type: Class
-    @Usage:
-
-      pathString = "Mx,yLx,y..."
-
-      pathJSON = [
-        {type:'moveTo', points: [x, y]},
-        {type:'lineTo', points: [x, y]},
-        {type:'quadraticCurveTo', points: [x1, y1, x2, y2]},
-        {type:'bezierCurveTo', points: [x1, y1, x2, y2, x3, y3]}
-        {type:'closePath'},
-        {type:'moveTo', points: [x, y]},
-        ...
-      ];
-
-*/
 
 var order2func = {
   'M': 'moveTo',
