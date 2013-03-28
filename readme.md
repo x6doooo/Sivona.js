@@ -5,13 +5,16 @@ canvas绘制类库
 
 ===
 
-##API
+##Getting Start
 
 ===
-	
-####SI ( id, width, height )
+
+###初始化画布
+
+####方法：SI( id, width, height )
 	
 @Params:
+
  - id {String} 画布插入位置
 
  - width {Number} 画布宽度（可选）
@@ -24,3 +27,4 @@ canvas绘制类库
 
 	var paper  = SI('div1', 100, 100);
 	paper.rect(10, 10, 20, 20);
+
