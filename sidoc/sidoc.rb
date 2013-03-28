@@ -8,6 +8,7 @@ config = [
     'util.js',
     'const.js',
     'init.js',
+    'event.js',
     'canvas.js',
     'exports.js',
     'suffix'
@@ -24,6 +25,7 @@ config.each do |path|
   end
 end
 
+puts files.length
 files = files.join
 
 heads = {
@@ -39,5 +41,4 @@ tags = [
     "@Usage",
     "@Return"
 ]
-
-puts files.scan(/\/\*![^*]*\*+(?:[^*\/][^*]*\*+)*\//)
+#puts files.scan(/\/\*![^*]*\*+(?:[^*\/][^*]*\*+)*\//)
