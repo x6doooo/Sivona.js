@@ -29,7 +29,6 @@ Paper.include({
     self.allElements = [];
     self.initEveHandler();
     self.reset();
-
   },
   eveHandler: function(e){
   },
@@ -39,7 +38,7 @@ Paper.include({
       node = self.canvasNode,
       eves = {};
     events.forEach(function(event){
-      eves[event] = new EvArray(node, event);
+      eves[event] = new EvArray(self, event);
     })
     self.eves = eves;
   },
@@ -158,19 +157,28 @@ Paper.include({
     el.pathJSON = json;
     return self.initShape(el);
   },
-  render: function(){
+  render: function(check){
     var self = this,
-      allElements = self.allElements;
+      allElements = self.allElements,
+      ctx = self.canvasContext,
+      which = [];
     allElements.sort(function(a, b){
       return a.zIndex - b.zIndex;
     });
     allElements.forEach(function(el, idx, all){
       el.render();
+      if(check && ctx.isPointInPath(check.x, check.y)){
+        which.push(el);
+      }
     });
+    return which;
   },
   refresh: function(){
     this.clear();
     this.render();
+  },
+  whichHasThisPoint: function(p){
+    return this.render(p);
   }
 });
 
@@ -308,7 +316,6 @@ Cpath.include({
         if(cfg.fillStyle != 'none'){
           ctx.fill();
         }
-        ctx.beginPath();
       }
     });
     self.closeit = false;

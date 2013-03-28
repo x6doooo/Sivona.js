@@ -14,9 +14,10 @@ function getEventPosition(ev){
 
 EvArray = new Class;
 EvArray.include({
-  init: function(node, event){
+  init: function(paper, event){
     this.els = [];
-    this.node = node;
+    this.paper = paper;
+    this.node = paper.canvasNode;
     this.event = event;
   },
   push: function(el){
@@ -39,8 +40,11 @@ EvArray.include({
       node = self.node,
       event = self.event,
       handle = self.handle;
-    node.addEventListener(event, handle, false);
+    node.addEventListener(event, function(e){
+      handle.call(self, e);
+    }, false);
   },
+  /*
   unbind: function(){
     var self = this,
       node = self.node,
@@ -48,8 +52,26 @@ EvArray.include({
       handle = self.handle;
     node.removeEventListener(event, handle, false);
   },
+  */
   handle: function(e){
-    console.log(e);
+    var self = this,
+      paper = self.paper,
+      p = getEventPosition(e),
+      els = self.els,
+      el,
+      len;
+    p = paper.whichHasThisPoint(p);
+    len = p.length;
+    if(len == 0){
+      return;
+    }
+    el = p[len-1];
+    els.forEach(function(v, i, a){
+      if(v.target == el){
+        v.handle.call(v.target);
+      }
+    });
+
   }
 });
 
