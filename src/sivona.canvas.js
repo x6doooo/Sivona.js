@@ -52,6 +52,7 @@ Paper.include({
     el.context = self.canvasContext;
     el.display = true;
     el.zIndex = els.length;
+    el.closeit = false;
     els.push(el);
     return el;
   },
@@ -126,6 +127,10 @@ Celement.include({
   hide: function(){
     this.display = false;
   },
+  close: function(){
+    this.closeit = true;
+    return this;
+  },
   render: function(){
     var self = this,
       cfg = self.cfg,
@@ -135,6 +140,10 @@ Celement.include({
     });
     ctx.beginPath();
     self.draw();
+    if(self.closeit === true){
+      console.log(self.closeit);
+      ctx.closePath();
+    }
     //ctx.lineWidth不能赋予0或其他非数字
     //so 不画边框 就根据cfg来判断
     if(cfg.lineWidth != 0){
