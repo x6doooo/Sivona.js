@@ -10,6 +10,7 @@ var Paper,
   Carc,
   Cellipse,
   Cpath,
+//TODO: T\S\H\V命令
   order2func = {
     'M': 'moveTo',
     'L': 'lineTo',
@@ -42,8 +43,7 @@ Paper.include({
     cn.style.position = 'absolute';
     self.width = cn.width = w;
     self.height = cn.height = h;
-    //TODO: id自更新
-    cn.id = 'c1';
+    cn.id = container_id + '_canvas';
     ct.appendChild(cn);
     self.container = ct;
     self.canvasNode = cn;
@@ -146,6 +146,9 @@ Paper.include({
     }
     ctxt.clearRect(l, t, w, h);
   },
+  /*!Private
+      创建图形时初始化一些属性
+   */
   initShape: function(el){
     var self = this,
       els = self.allElements,
@@ -292,6 +295,14 @@ Paper.include({
     el.pathJSON = json;
     return self.initShape(el);
   },
+  /*Private
+
+      清空画布 重绘一帧
+      whoHasThisPoint方法也通过render实现
+      重绘帧的过程中，对每个path使用isPointInPath方法
+      检查是否有该点
+
+   */
   render: function(check){
     var self = this,
       allElements = self.allElements,
@@ -414,6 +425,7 @@ Matrix.include({
 
 /*!
     TODO: 数据绑定
+    TODO: 同类元素的集合，通过集合改变属性、增删事件
  */
 Celement = new Class(Matrix);
 Celement.include({
