@@ -24,7 +24,7 @@ function toFixed(nu, pos){
   return to_f(nu.toFixed(pos));
 }
 
-//forEach
+//Object forEach
 function forEach(obj, iterator, context) {
   var key;
   if (isFunction(obj)){
