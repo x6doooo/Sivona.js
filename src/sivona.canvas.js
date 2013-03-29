@@ -4,6 +4,7 @@
     @Info: 画布类，实例拥有各种绘图方法 一般通过SI方法new出实例
  */
 var Paper,
+  Matrix,
   Celement,
   Crect,
   Carc,
@@ -70,6 +71,7 @@ Paper.include({
           tem_over = [],
           tem_out = [],
           tem_move = [];
+        if(type == 'mouseover' || type == 'mouseout') return;
         p = getEventPosition(e);
         who = self.whoHasThisPoint(p);
         if(type == 'click'){
@@ -118,7 +120,7 @@ Paper.include({
       }, false);
     });
   },
-  /*!
+  /*!Private
       @Name: paper.reset
       @Info: 重置context环境的属性值，恢复到默认值
    */
@@ -129,7 +131,7 @@ Paper.include({
       context[k] = v;
     });
   },
-  /*!
+  /*!Private
       @Name: paper.clear
       @Info: 清空画布
    */
@@ -148,12 +150,9 @@ Paper.include({
     var self = this,
       els = self.allElements,
       eves = self.eves;
-    el.income = false;
     el.paper = self;
     el.context = self.canvasContext;
-    el.display = true;
     el.zIndex = els.length;
-    el.closeit = true;
     /*
         绑定事件
         TODO:解除绑定的方法（要在EvArray的实例里删除该元素注册的事件， 只删除一个方法，不多删！）
@@ -260,24 +259,26 @@ Paper.include({
    @Name: path
    @Info: 路径方法
    @Type: Method
+   @Params:
+   - {JSON or String} 描述路径的json或者string，如果是string，会由内置的parse转换成json
    @return: path实例
    @Usage:
 
    pathString = "Mx,yLx,y..."
 
    pathJSON = [
-   {type:'moveTo', points: [x, y]},
-   {type:'lineTo', points: [x, y]},
-   {type:'quadraticCurveTo', points: [x1, y1, x2, y2]},
-   {type:'bezierCurveTo', points: [x1, y1, x2, y2, x3, y3]}
-   {type:'closePath'},
-   {type:'moveTo', points: [x, y]},
-   ...
+    {type:'moveTo', points: [x, y]},
+    {type:'lineTo', points: [x, y]},
+    {type:'quadraticCurveTo', points: [x1, y1, x2, y2]},
+    {type:'bezierCurveTo', points: [x1, y1, x2, y2, x3, y3]}
+    {type:'closePath'},
+    {type:'moveTo', points: [x, y]},
+    ...
    ];
 
    paper.path(pathString);
 
-   or
+   //or
 
    paper.path(pathJSON);
 
@@ -313,26 +314,118 @@ Paper.include({
     this.clear();
     this.render();
   },
+  /*!Private
+
+      @Name: whoHasThisPoint
+      @Info: 检查一个点在哪些形状的范围内 通过调用render方法实现
+      @Type: Method
+      @Params:
+      - p {Object} 坐标p.x p.y
+      @Return:
+      - {Array} 包含该点的形状对象的数组
+
+   */
   whoHasThisPoint: function(p){
     return this.render(p);
   }
 });
 
-/*!
-    TODO: Matrix类
+/*!Private
+
+    @Name: Matrix
+    @Info: 矩阵变换类，是Celement的父类。
+    @Type: Class
+    @Params: 无
+
  */
 
+Matrix = new Class;
+Matrix.extend({
+  p2p: function(p, m){
+    var x = p[0],
+      y = p[1];
+    return [
+      x * m[0] + y * m[2] + m[4],
+      x * m[1] + y * m[3] + m[5]
+    ];
+  }
+});
+Matrix.include({
+  init: function(){
+    this.matrix = [1, 0, 0, 1, 0, 0];
+  },
+  update: function(a, b, c, d, e, f){
+    var self = this,
+      m = self.matrix,
+      ft = [
+        [m[0], m[2], m[4]],
+        [m[1], m[3], m[5]],
+        [0, 0 ,1]
+      ],
+      bk = [
+        [a, c, e],
+        [b, d, f],
+        [0, 0, 1]
+      ],
+      rs = [[], [], []],
+      tm, x, y, z;
+    for(x = 0; x < 3; x++){
+      for(y = 0; y < 3; y++){
+        tm = 0;
+        for(z = 0; z < 3; z++){
+          tm += ft[x][z] * bk[z][y];
+        }
+        rs[x][y] = tm;
+      }
+    }
+    self.matrix = [
+      rs[0][0],
+      rs[1][0],
+      rs[0][1],
+      rs[1][1],
+      rs[0][2],
+      rs[1][2]
+    ];
+  },
+  resetContextMatrix: function(){
+    this.context.setTransform(1, 0, 0, 1, 0, 0);
+  },
+  translate: function(x, y){
+    this.update(1, 0, 0, 1, x, y);
+  },
+  transform: function(a, b, c, d, e, f){
+  },
+  scale: function(sx, sy, x, y){
+    sy = sy || sx;
+    (x || y) && this.update(1, 0, 0, 1, x, y);
+    this.update(sx, 0, 0, sy, 0, 0);
+    (x || y) && this.update(1, 0, 0, 1, -x, -y);
+  },
+  rotate: function(a, x, y){
+    a = deg2rad(a);
+    x = x || 0;
+    y = y || 0;
+    var sina = toFixed(sin(a), 9),
+      cosa = toFixed(cos(a), 9);
+    this.update(cosa, sina, -sina, cosa, x, y);
+    (x || y) && this.update(1, 0, 0, 1, -x, -y);
+  }
+});
+
 /*!
-    TODO: scale、rotate、tanslate
     TODO: 数据绑定
  */
-Celement = new Class;
+Celement = new Class(Matrix);
 Celement.include({
   init: function(){
     var self = this;
+    self.supr();
     forEach(arguments[0], function(v, k){
       self[k] = v;
     })
+    self.display = true;
+    self.income = false;
+    self.closeit = true;
     self.cfg = {};
   },
   setIncome: function(b){
@@ -376,13 +469,16 @@ Celement.include({
   render: function(){
     var self = this,
       cfg = self.cfg,
-      ctx = self.context;
+      ctx = self.context,
+      mtx = self.matrix;
     if(self.display === false) return;
     forEach(cfg, function(v, k){
       ctx[k] = v;
     });
     ctx.beginPath();
+    ctx.setTransform.apply(ctx, mtx);
     self.draw();
+    self.resetContextMatrix(ctx);
     if(self.closeit === true){
       ctx.closePath();
     }
