@@ -17,7 +17,10 @@ var PI = Math.PI,
     font: '12px',
     textBaseline: 'middle',
     textAlign: 'center'
-  };
+  },
+  sin = Math.sin,
+  cos = Math.cos,
+  tan = Math.tan;
 
 function deg2rad(d){
   return d * PI / 180;
