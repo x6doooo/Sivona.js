@@ -10,6 +10,7 @@ config = [
     'const.js',
     'init.js',
     'event.js',
+    'animation.js',
     'canvas.js',
     'exports.js',
     'suffix'
