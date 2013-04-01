@@ -56,6 +56,7 @@ Paper.include({
       初始化事件处理对象
       TODO：鼠标进入canvas元素之后，只有mousemove事件。需要根据经过的元素，判断在各元素之间的over和out。
       TODO: mousedown mouseup dbclick
+      Todo: 事件冒泡
    */
   initEveHandler: function(){
     var self = this,

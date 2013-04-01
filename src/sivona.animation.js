@@ -1,4 +1,9 @@
 /*
+ matrix、attributes
+ TODO:？？？ path  转换path描述？？？
+ Todo: 多个canvas同时执行动画 test
+ Todo: 中断动画 test
+
     animator = new Animator();
 
     matrix属性: scale, rotate, translate, transform
@@ -65,27 +70,31 @@ Animator.include({
             tar: v
           };
           break;
-        case 'fillStyle':
-          break;
         default:
-          cfg[k] = cfg[k] || 0;
-          am[k] = {
-            src: cfg[k],
-            st: (v - cfg[k])/hl,
-            tar: v
-          };
+          if(v.indexOf('#') != -1){
+            //颜色处理
+            cfg[k] = cfg[k] || 0xffffff;
+            v = hex2num(v);
+            am[k] = {
+              src: cfg[k],
+              st: (v - cfg[k])/hl,
+              tar: v
+            };
+            console.log(am[k]);
+          }else{
+            cfg[k] = cfg[k] || 0;
+            am[k] = {
+              src: cfg[k],
+              st: (v-cfg[k])/hl,
+              tar: v
+            };
+          }
           break;
       }
     });
     amtArr.push([el, am, hl, cb]);
-    console.log([el, am, hl, cb]);
-    /*!Private
-        matrix、attributes
-        TODO:？？？ path  转换path描述？？？
-     */
 
     if(oldStatus == 0){ //不为0则有action在执行
-      self.count = 0;
       self.action();
     }
   },
@@ -103,9 +112,10 @@ Animator.include({
       cb,
       src,
       st,
-      tar;
+      tar,
+      tem;
+
     amtArr.forEach(function(v, i, a){
-      console.log(v);
       el = v[0];
       am = v[1];
       hl = v[2];
@@ -126,8 +136,15 @@ Animator.include({
           src.forEach(function(o, n, aa){
             aa[n] += st[n];
           });
+        }else if(k.search(/fillStyle|strokeStyle|shadowColor/) != -1){
+          tem = {};
+//          tem[k] = '#' + (~~src).toString(16);
+          el.attr(tem);
+          val.src = src + st;
         }else{
-          el.attr(k, src);
+          tem = {};
+          tem[k] = src;
+          el.attr(tem);
           val.src += st;
         }
       });

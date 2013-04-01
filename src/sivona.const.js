@@ -33,3 +33,13 @@ function rad2deg(r){
 // Todo 颜色转换
 function rgba2hex(){}
 
+// Todo Hex to number
+function hex2num(v){
+  return v.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function(m, r, g, b) {
+    return r + r + g + g + b + b;
+  });
+}
+function num2hex(v){
+
+}
+

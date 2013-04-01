@@ -64,7 +64,6 @@ function extend(){
   for( ;i < len; i++ ){
     ops = args[i];
     for (name in ops) {
-      console.log(ops);
       src = target[name];
       copy = ops[name];
       if (target === ops[name]) continue;
