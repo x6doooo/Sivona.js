@@ -58,14 +58,16 @@ Animator.include({
       st = self.step,
       cfg = el.cfg,
       am = arr[0],
-      hl = to_i(arr[1]/st),
+      hl = to_i((arr[1]||500)/st),
       cb = arr[2];
+
     forEach(am, function(v, k){
       switch(k){
         case 'translate':
           am[k] = {
             st: [v[0]/hl, v[1]/hl],
-            src: [0, 0]
+            src: [0, 0],
+            tar: v
           };
           break;
         case 'rotate':
@@ -73,7 +75,8 @@ Animator.include({
           v[2] = v[2] || 0;
           am[k] = {
             st: [v[0]/hl, 0, 0],
-            src: [0, v[1], v[2]]
+            src: [0, v[1], v[2]],
+            tar: v
           };
           break;
         case 'scale':
@@ -81,8 +84,9 @@ Animator.include({
           v[2] = v[2] || 0;
           v[3] = v[3] || 0;
           am[k] = {
-            st: [ v[0]/hl, v[1]/hl, 0, 0 ],
-            src: [0, 0, v[2], v[3]]
+            st: [ (v[0]-1)/hl, (v[1]-1)/hl, 0, 0 ],
+            src: [1, 1, v[2], v[3]],
+            tar: v
           };
           break;
         case 'fillStyle':
@@ -91,13 +95,14 @@ Animator.include({
           cfg[k] = cfg[k] || 0;
           am[k] = {
             src: cfg[k],
-            st: (v - cfg[k])/hl
+            st: (v - cfg[k])/hl,
+            tar: v
           };
           break;
       }
     });
     amtArr.push([el, am, hl, cb]);
-
+    console.log([el, am, hl, cb]);
     /*!Private
 
       Types:
@@ -110,13 +115,10 @@ Animator.include({
 
     if(oldStatus == 0){ //不为0则有action在执行
 
+      self.count = 0;
       self.action();
 
     }
-
-  },
-  update: function(){
-
 
   },
   abort: function(){
@@ -130,23 +132,51 @@ Animator.include({
   },
   action: function(){
     var self = this,
-      amtArr = self.amtArr;
-
+      amtArr = self.amtArr,
+      el,
+      am,
+      hl,
+      cb;
     amtArr.forEach(function(v, i, a){
+      el = v[0];
+      am = v[1];
+      hl = v[2];
+      cb = v[3];
+
+      hl -= 1;
+      v[2] = hl;
 
       forEach(am, function(val, k){
         if(k.search(/scale|rotate|translate|transform/) != -1){
 
-          el[k].apply(el, val);
+          el.matrix = [1, 0, 0, 1, 0, 0];
+          if(hl == 0){
+            el[k].apply(el, val.tar);
+          }else{
+            el[k].apply(el, val.src);
+          }
+
+          val.src.forEach(function(o, n, aa){
+
+            aa[n] += val.st[n];
+
+          });
 
         }else{
 
-          //el[k]
+          el.attr(k, val.src);
+          val.src += val.st;
 
         }
+
+
       });
 
-      v[2] -= 1;
+      if(hl == 0){
+        cb();
+        amtArr.splice(i, 1);
+      }
+
 
     });
 
