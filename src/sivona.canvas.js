@@ -405,6 +405,7 @@ Matrix.include({
     this.update(1, 0, 0, 1, x, y);
   },
   transform: function(a, b, c, d, e, f){
+    this.update(a, b, c, d, e, f);
   },
   scale: function(sx, sy, x, y){
     sy = sy || sx;
@@ -426,6 +427,9 @@ Matrix.include({
 /*!
     TODO: 数据绑定
     TODO: 同类元素的集合，通过集合改变属性、增删事件
+
+    @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
+
  */
 Celement = new Class(Matrix);
 Celement.include({

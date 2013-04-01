@@ -8,6 +8,28 @@
     增加动画项目：元素、状态目标、当前状态
     删除动画项目
     动画执行控制器
+
+    animator = new Animator();
+
+    //translate
+    el.animate('scale', x, y);
+    el.animate('rotate', a, x, y);
+    el.animate('translate', x, y);
+    el.animate('transform', a, b, c, d, e, f);
+
+    //attr
+    el.animate('opacity', value);
+
+    //group
+    el.animate({
+      scale: [x, y],
+      rotate: [a, x, y],
+      opacity: value
+    });
+
+    //callback
+    el.animate({}, function(){});
+
  */
 var Animator = new Class;
 Animator.include({
@@ -16,7 +38,7 @@ Animator.include({
     this.step = 10;
     this.timer = null;
   },
-  add: function(){
+  add: function(arr){
 
     var self = this,
       amtArr = self.amtArr,
