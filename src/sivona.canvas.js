@@ -403,9 +403,11 @@ Matrix.include({
   },
   translate: function(x, y){
     this.update(1, 0, 0, 1, x, y);
+    this.paper.refresh();
   },
   transform: function(a, b, c, d, e, f){
     this.update(a, b, c, d, e, f);
+    this.paper.refresh();
   },
   scale: function(sx, sy, x, y){
     sy = sy || sx;
@@ -422,6 +424,7 @@ Matrix.include({
       cosa = toFixed(cos(a), 9);
     this.update(cosa, sina, -sina, cosa, x, y);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
+    this.paper.refresh();
   }
 });
 
