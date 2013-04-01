@@ -412,6 +412,7 @@ Matrix.include({
     (x || y) && this.update(1, 0, 0, 1, x, y);
     this.update(sx, 0, 0, sy, 0, 0);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
+    this.paper.refresh();
   },
   rotate: function(a, x, y){
     a = deg2rad(a);
@@ -506,6 +507,9 @@ Celement.include({
     if(cfg.fillStyle != 'none'){
       ctx.fill();
     }
+  },
+  animate: function(/* obj, num, func */){
+    Sanimator.add(this, arguments);
   }
 });
 

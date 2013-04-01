@@ -11,21 +11,32 @@
 
     animator = new Animator();
 
-    //translate
-    el.animate('scale', x, y);
-    el.animate('rotate', a, x, y);
-    el.animate('translate', x, y);
-    el.animate('transform', a, b, c, d, e, f);
+    matrix属性: scale, rotate, translate, transform
 
-    //attr
-    el.animate('opacity', value);
+    attr属性:
 
     //group
+    el.animate(object, number, function);
+
     el.animate({
       scale: [x, y],
       rotate: [a, x, y],
       opacity: value
+    }, step, function(){});
+
+    =>
+
+    el.animate({
+      scale:{
+        src: [x, y],
+        target: [x, y],
+        step: [x, y]
+      },
+      opacity: {
+        src: []
+      }
     });
+
 
     //callback
     el.animate({}, function(){});
@@ -38,21 +49,60 @@ Animator.include({
     this.step = 10;
     this.timer = null;
   },
-  add: function(arr){
+  add: function(el, arr){
 
+    //arr = [am, hl, cb]
     var self = this,
       amtArr = self.amtArr,
-      oldStatus = amtArr.length;
+      oldStatus = amtArr.length,
+      st = self.step,
+      cfg = el.cfg,
+      am = arr[0],
+      hl = to_i(arr[1]/st),
+      cb = arr[2];
+    forEach(am, function(v, k){
+      switch(k){
+        case 'translate':
+          am[k] = {
+            st: [v[0]/hl, v[1]/hl],
+            src: [0, 0]
+          };
+          break;
+        case 'rotate':
+          v[1]= v[1] || 0;
+          v[2] = v[2] || 0;
+          am[k] = {
+            st: [v[0]/hl, 0, 0],
+            src: [0, v[1], v[2]]
+          };
+          break;
+        case 'scale':
+          v[1] = v[1] || v[0];
+          v[2] = v[2] || 0;
+          v[3] = v[3] || 0;
+          am[k] = {
+            st: [ v[0]/hl, v[1]/hl, 0, 0 ],
+            src: [0, 0, v[2], v[3]]
+          };
+          break;
+        case 'fillStyle':
+          break;
+        default:
+          cfg[k] = cfg[k] || 0;
+          am[k] = {
+            src: cfg[k],
+            st: (v - cfg[k])/hl
+          };
+          break;
+      }
+    });
+    amtArr.push([el, am, hl, cb]);
 
     /*!Private
-
-      constructor
 
       Types:
 
         matrix、attributes
-
-        TODO: pass value \ step value \ target value
 
         TODO:？？？ path  转换path描述？？？
 
@@ -79,13 +129,26 @@ Animator.include({
 
   },
   action: function(){
-    var self = this;
+    var self = this,
+      amtArr = self.amtArr;
 
-    /*!Private
+    amtArr.forEach(function(v, i, a){
 
-       update all els status
+      forEach(am, function(val, k){
+        if(k.search(/scale|rotate|translate|transform/) != -1){
 
-     */
+          el[k].apply(el, val);
+
+        }else{
+
+          //el[k]
+
+        }
+      });
+
+      v[2] -= 1;
+
+    });
 
     self.timer = setTimeout(function(){
 
@@ -104,3 +167,6 @@ Animator.include({
 
   }
 });
+
+//主动画控制器
+var Sanimator = new Animator();

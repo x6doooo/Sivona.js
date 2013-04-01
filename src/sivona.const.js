@@ -30,3 +30,6 @@ function rad2deg(r){
   return r * 180 / PI;
 }
 
+// Todo 颜色转换
+function rgba2hex(){}
+
