@@ -8,14 +8,27 @@
 <body>
 	<div id="box"></div>
 	<script>
-		paper = SI('box');
+		//初始化画布
+		paper = SI('box', 500, 1000);
+
+		//绘制一个矩形，然后给矩形增加样式属性
 		rect = paper.rect(10, 10, 200, 150);
 		rect.attr({'fillStyle': 'orange','lineWidth': 10});
-		circle = paper.circle(300, 80, 70).attr({'fillStyle': '#099', 'lineWidth':0});
-		arc = paper.arc(450, 80, 50, Math.PI, 1.4 * Math.PI).attr({'fillStyle': '#ff0', lineWidth: 10});
-		ellipse = paper.ellipse(640, 80, 100, 50).attr({'fillStyle': '#191'});
-		path = paper.path('M800,30 L820,120 L890,30Z').attr({'fillStyle': 'none', 'lineWidth': 5});
-		path2 = paper.path('M830,50 L850,140 L920,50Z').attr({'globalAlpha': 0.5});
+
+		//绘制一个圆形，并用链式写法增加样式属性（不给圆形加边框）
+		circle = paper.circle(100, 260, 70).attr({'fillStyle': '#099', 'lineWidth':0});
+
+		//绘制弧形
+		arc = paper.arc(100, 420, 50, Math.PI, 1.4 * Math.PI).attr({'fillStyle': '#ff0', lineWidth: 10});
+
+		//绘制椭圆
+		ellipse = paper.ellipse(120, 550, 100, 50).attr({'fillStyle': '#191'});
+
+		//绘制路径（不给路径填充色）
+		path = paper.path('M30,680 L120,810 L190,630Z').attr({'fillStyle': 'none', 'lineWidth': 5});
+
+		//绘制路径（设置透明度）
+		path2 = paper.path('M70,710 L160,840 L230,660Z').attr({'globalAlpha': 0.5});
 	</script>
 </body>
 </html>
