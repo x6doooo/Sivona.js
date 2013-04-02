@@ -1,5 +1,5 @@
 var EvArray,
-  domEvents = ['click', 'mouseover', 'mouseout', 'mousemove'];
+  domEvents = ['click', 'mouseover', 'mouseout', 'mousemove', 'mousedown', 'mouseup'];
 
 EvArray = new Class;
 EvArray.include({
@@ -20,13 +20,13 @@ EvArray.include({
   forEach: function(func){
     return this.els.forEach(func);
   },
-  handle: function(whichs ,e){
+  handle: function(whichs, e){
     var self = this,
       els = self.els,
       el = whichs[whichs.length-1];
     els.forEach(function(v, i, a){
       if(v.target == el){
-        v.handle.call(v.target);
+        v.handle.call(v.target, e);
       }
     });
   }

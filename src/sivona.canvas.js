@@ -74,9 +74,9 @@ Paper.include({
         if(type == 'mouseover' || type == 'mouseout') return;
         p = getEventPosition(e);
         who = self.whoHasThisPoint(p);
-        if(type == 'click'){
+        if(type == 'click' || type == 'mousedown' || type == 'mouseup'){
           if(who.length == 0) return;
-          self.eves['click'].handle(who, e);
+          self.eves[type].handle(who, e);
         }else if(type == 'mousemove'){
           if(who.length != 0 && self.hasIn.length == 0){
             //over
