@@ -6,6 +6,19 @@
 	<script type="text/javascript" src="../../src/sivona.js"></script>
 </head>
 <body>
+	<div id="box"></div>
+	<script>
+		paper = SI('box', 700, 100);
+
+		circle = paper.circle(50, 50, 10).attr({'fillStyle': '#f00', 'lineWidth': 0});
+
+		circle.animate({
+
+			'fillStyle': '#369'
+
+		})
+
+	</script>
 </body>
 </html>
 </body>

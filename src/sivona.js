@@ -357,7 +357,7 @@ Animator.include({
       cfg = el.cfg,
       am = arr[0],
       hl = to_i((arr[1]||500)/st),
-      cb = arr[2];
+      cb = arr[2] || function(){};
 
     forEach(am, function(v, k){
       switch(k){
