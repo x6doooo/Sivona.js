@@ -397,7 +397,6 @@ Animator.include({
               st: [(v[0] - cfg[k][0])/hl, (v[1]-cfg[k][1])/hl, (v[2]-cfg[k][2])/hl],
               tar: v
             };
-            console.log(am[k]);
           }else{
             cfg[k] = cfg[k] || 0;
             am[k] = {
@@ -468,8 +467,8 @@ Animator.include({
         }
       });
       if(hl == 0){
-        cb();
         amtArr.splice(i, 1);
+        cb();
       }
     });
     self.timer = setTimeout(function(){
