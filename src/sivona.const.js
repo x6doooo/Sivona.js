@@ -30,10 +30,7 @@ function rad2deg(r){
   return r * 180 / PI;
 }
 
-// Todo 颜色转换
-function rgba2hex(){}
-
-// Todo Hex to number
+// hex2num('#369') => [51, 102, 153]
 function hex2num(v){
   var arr = v.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function(m, r, g, b) {
     return [parseInt(r + r, 16), parseInt(g + g, 16), parseInt(b + b, 16)];
@@ -43,9 +40,8 @@ function hex2num(v){
   });
   return arr;
 }
-function num2hex(v){}
 
-//hex1 = rgb2hex('188,120,119');
+// rgb2hex(51,102,153); => '#369'
 function rgb2hex(r, g, b) {
   return '#' + fix(r) + fix(g) + fix(b);
   function fix(v) {
