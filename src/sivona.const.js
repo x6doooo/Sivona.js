@@ -47,15 +47,15 @@ function num2hex(v){}
 
 //hex1 = rgb2hex('188,120,119');
 function rgb2hex(r, g, b) {
-  return '#' + rgb2hex_fix(r) + rgb2hex_fix(g) + rgb2hex_fix(b);
+  return '#' + fix(r) + fix(g) + fix(b);
+  function fix(v) {
+    if(v <= 16){
+      v = '0' + (~~v).toString(16);
+    }else{
+      v = (~~v).toString(16);
+    }
+    return v;
+  }
 }
 
-function rgb2hex_fix(v) {
-  if(v <= 16){
-    v = '0' + (~~v).toString(16);
-  }else{
-    v = (~~v).toString(16);
-  }
-  return v;
-}
 

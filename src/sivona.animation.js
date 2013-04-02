@@ -72,7 +72,7 @@ Animator.include({
           break;
         default:
           if(v.indexOf('#') != -1){
-            //Todo： 颜色处理 本来有颜色 貌似没获取到
+            //Todo：如果元素本身没有设置颜色，颜色是从上一级context继承的，那么这里不会获取到颜色
             cfg[k] = hex2num(cfg[k] || '#fff');
             v = hex2num(v);
             am[k] = {
