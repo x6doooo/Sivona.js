@@ -54,8 +54,11 @@ Paper.include({
   },
   /*
       初始化事件处理对象
-      TODO: mousedown mouseup dbclick drag
       Todo: 事件冒泡
+      Todo: 泛光效果
+      Todo: image
+      Todo: clip
+      Todo: pattern
    */
   initEveHandler: function(){
     var self = this,
@@ -478,6 +481,7 @@ Matrix.include({
 
 /*!
     TODO: 同类元素的集合，通过集合改变属性、增删事件
+    Todo: text绘制方法
     @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
  */
 Celement = new Class(Matrix);
