@@ -63,11 +63,13 @@ Paper.include({
       events = domEvents;
     self.eves = {};
     self.hasIn = [];
+    self.isDrag = false;
     events.forEach(function(event){
       self.eves[event] = new EvArray(self, event);
       node.addEventListener(event, function(e){
         var type = e.type,
           p, who, tem,
+          pos_now, pos_old,
           tem_over = [],
           tem_out = [],
           tem_move = [];
@@ -76,7 +78,16 @@ Paper.include({
         who = self.whoHasThisPoint(p);
         if(type.search(/click|mousedown|mouseup|dbclick/) != -1){
           if(who.length == 0) return;
+          if(type == 'mousedown'){
+            self.isDrag = who[who.length - 1];
+            self.isDrag.oldPos = getEventPosition(e);
+            //self.dragPos = getEventPosition(e)
+          }
+          if(type == 'mouseup') self.isDrag = false;
           self.eves[type].handle(who, e);
+        }else if(type == 'mousemove' && self.isDrag){
+          //drag
+          self.eves['drag'].handle([self.isDrag], e);
         }else if(type == 'mousemove'){
           if(who.length != 0 && self.hasIn.length == 0){
             //over
@@ -164,6 +175,7 @@ Paper.include({
       el[event] = function(func){
         eves[event].push({
           target: el,
+          type: event,
           handle: func
         });
       };

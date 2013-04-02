@@ -1,5 +1,5 @@
 var EvArray,
-  domEvents = ['click', 'mouseover', 'mouseout', 'mousemove', 'mousedown', 'mouseup'];
+  domEvents = ['click', 'mouseover', 'mouseout', 'mousemove', 'mousedown', 'mouseup', 'drag'];
 
 EvArray = new Class;
 EvArray.include({
@@ -30,6 +30,12 @@ EvArray.include({
       el = whichs[whichs.length-1];
     els.forEach(function(v, i, a){
       if(v.target == el){
+        if(v.type == 'drag'){
+          nowPos = getEventPosition(e);
+          oldPos = el.oldPos;
+          el.translate(nowPos.x - oldPos.x, nowPos.y - oldPos.y);
+          el.oldPos = nowPos;
+        }
         v.handle.call(v.target, e);
       }
     });
