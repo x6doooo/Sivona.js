@@ -169,7 +169,6 @@ Paper.include({
     el.zIndex = els.length;
     /*
         绑定事件
-        TODO:解除绑定的方法（要在EvArray的实例里删除该元素注册的事件， 只删除一个方法，不多删！）
      */
     domEvents.forEach(function(event){
       el[event] = function(func){
