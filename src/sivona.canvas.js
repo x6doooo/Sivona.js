@@ -54,8 +54,7 @@ Paper.include({
   },
   /*
       初始化事件处理对象
-      TODO：鼠标进入canvas元素之后，只有mousemove事件。需要根据经过的元素，判断在各元素之间的over和out。
-      TODO: mousedown mouseup dbclick
+      TODO: mousedown mouseup dbclick drag
       Todo: 事件冒泡
    */
   initEveHandler: function(){
@@ -430,11 +429,8 @@ Matrix.include({
 });
 
 /*!
-    TODO: 数据绑定
     TODO: 同类元素的集合，通过集合改变属性、增删事件
-
     @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
-
  */
 Celement = new Class(Matrix);
 Celement.include({
@@ -448,6 +444,7 @@ Celement.include({
     self.income = false;
     self.closeit = true;
     self.cfg = {};
+    self.data = {};
   },
   setIncome: function(b){
     var self = this,
@@ -460,6 +457,14 @@ Celement.include({
       hasIn.splice(idx, 1);
     }
     self.income = b;
+  },
+  data: function(k, v){
+    var self = this;
+    if(isDefined(v)){
+      self.data[k] = v;
+      return self;
+    }
+    return self.data[k];
   },
   attr: function(cfg){
     var self = this;
