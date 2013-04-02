@@ -8,15 +8,26 @@
 <body>
 	<div id="box"></div>
 	<script>
-		paper = SI('box', 700, 100);
+		paper = SI('box', 700, 700);
 
 		circle = paper.circle(50, 50, 10).attr({'fillStyle': '#f00', 'lineWidth': 0});
 
-		circle.animate({
+		//设置动画目标
+		target = {
+			'fillStyle': '#369',
+			'scale': [3, 3]
+		};
 
-			'fillStyle': '#369'
+		//设置动画时长
+		time = 500;
 
-		})
+		//设置回调函数
+		function callback(){
+			console.log('done');
+		}
+
+		//注册动画
+		circle.animate(target, time, callback);
 
 	</script>
 </body>
