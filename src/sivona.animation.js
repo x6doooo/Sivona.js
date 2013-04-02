@@ -72,12 +72,12 @@ Animator.include({
           break;
         default:
           if(v.indexOf('#') != -1){
-            //颜色处理
-            cfg[k] = cfg[k] || 0xffffff;
+            //Todo： 颜色处理 本来有颜色 貌似没获取到
+            cfg[k] = hex2num(cfg[k] || '#fff');
             v = hex2num(v);
             am[k] = {
               src: cfg[k],
-              st: (v - cfg[k])/hl,
+              st: [(v[0] - cfg[k][0])/hl, (v[1]-cfg[k][1])/hl, (v[2]-cfg[k][2])/hl],
               tar: v
             };
             console.log(am[k]);
@@ -138,9 +138,11 @@ Animator.include({
           });
         }else if(k.search(/fillStyle|strokeStyle|shadowColor/) != -1){
           tem = {};
-//          tem[k] = '#' + (~~src).toString(16);
+          tem[k] = rgb2hex.apply(this, src);
           el.attr(tem);
-          val.src = src + st;
+          src.forEach(function(o, n, aa){
+            aa[n] += st[n]
+          });
         }else{
           tem = {};
           tem[k] = src;

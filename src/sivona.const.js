@@ -35,11 +35,27 @@ function rgba2hex(){}
 
 // Todo Hex to number
 function hex2num(v){
-  return v.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function(m, r, g, b) {
-    return r + r + g + g + b + b;
+  var arr = v.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function(m, r, g, b) {
+    return [parseInt(r + r, 16), parseInt(g + g, 16), parseInt(b + b, 16)];
+  }).split(',');
+  arr.forEach(function(v, i, a){
+    a[i] = to_i(v);
   });
+  return arr;
 }
-function num2hex(v){
+function num2hex(v){}
 
+//hex1 = rgb2hex('188,120,119');
+function rgb2hex(r, g, b) {
+  return '#' + rgb2hex_fix(r) + rgb2hex_fix(g) + rgb2hex_fix(b);
+}
+
+function rgb2hex_fix(v) {
+  if(v <= 16){
+    v = '0' + (~~v).toString(16);
+  }else{
+    v = (~~v).toString(16);
+  }
+  return v;
 }
 
