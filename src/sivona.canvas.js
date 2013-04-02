@@ -74,7 +74,7 @@ Paper.include({
         if(type == 'mouseover' || type == 'mouseout') return;
         p = getEventPosition(e);
         who = self.whoHasThisPoint(p);
-        if(type == 'click' || type == 'mousedown' || type == 'mouseup'){
+        if(type.search(/click|mousedown|mouseup|dbclick/) != -1){
           if(who.length == 0) return;
           self.eves[type].handle(who, e);
         }else if(type == 'mousemove'){
@@ -446,7 +446,7 @@ Celement.include({
     self.display = true;
     self.income = false;
     self.closeit = true;
-    self.cfg = {};
+    self.cfg = extend(true, {}, defaultCfg);
     self.data = {};
   },
   setIncome: function(b){
