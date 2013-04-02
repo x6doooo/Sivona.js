@@ -73,7 +73,6 @@ function extend(){
   for( ;i < len; i++ ){
     ops = args[i];
     for (name in ops) {
-      console.log(ops);
       src = target[name];
       copy = ops[name];
       if (target === ops[name]) continue;
@@ -215,6 +214,31 @@ function rad2deg(r){
   return r * 180 / PI;
 }
 
+// hex2num('#369') => [51, 102, 153]
+function hex2num(v){
+  var arr = v.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function(m, r, g, b) {
+    return [parseInt(r + r, 16), parseInt(g + g, 16), parseInt(b + b, 16)];
+  }).split(',');
+  arr.forEach(function(v, i, a){
+    a[i] = to_i(v);
+  });
+  return arr;
+}
+
+// rgb2hex(51,102,153); => '#369'
+function rgb2hex(r, g, b) {
+  return '#' + fix(r) + fix(g) + fix(b);
+  function fix(v) {
+    if(v <= 16){
+      v = '0' + (~~v).toString(16);
+    }else{
+      v = (~~v).toString(16);
+    }
+    return v;
+  }
+}
+
+
 var Version = 0.01,
   /*!
     @Name: SI
@@ -235,7 +259,7 @@ var Version = 0.01,
   };
 
 var EvArray,
-  domEvents = ['click', 'mouseover', 'mouseout', 'mousemove'];
+  domEvents = ['click', 'mouseover', 'mouseout', 'mousemove', 'mousedown', 'mouseup', 'drag'];
 
 EvArray = new Class;
 EvArray.include({
@@ -250,19 +274,29 @@ EvArray.include({
       els = self.els;
     els.push(el);
   },
-  delete: function(el){
-    this.els.forEach(el);
+  delete: function(el, func){
+    this.els.forEach(function(v, i, a){
+      if(v.target == el && v.handle == func){
+        a.splice(i, 1);
+      }
+    });
   },
   forEach: function(func){
     return this.els.forEach(func);
   },
-  handle: function(whichs ,e){
+  handle: function(whichs, e){
     var self = this,
       els = self.els,
       el = whichs[whichs.length-1];
     els.forEach(function(v, i, a){
       if(v.target == el){
-        v.handle.call(v.target);
+        if(v.type == 'drag'){
+          nowPos = getEventPosition(e);
+          oldPos = el.oldPos;
+          el.translate(nowPos.x - oldPos.x, nowPos.y - oldPos.y);
+          el.oldPos = nowPos;
+        }
+        v.handle.call(v.target, e);
       }
     });
   }
@@ -280,7 +314,177 @@ function getEventPosition(ev){
   return {x: x, y: y};
 }
 
-/*!
+/*
+ matrix、attributes
+ TODO:？？？ path  转换path描述？？？
+ Todo: 多个canvas同时执行动画 test
+ Todo: 中断动画 test
+
+    animator = new Animator();
+
+    matrix属性: scale, rotate, translate, transform
+
+    attr属性:
+
+    //group
+    el.animate(object, number, function);
+
+    el.animate({
+      scale: [x, y],
+      rotate: [a, x, y],
+      opacity: value
+    }, step, function(){});
+
+    //callback
+    el.animate({}, function(){});
+
+ */
+var Animator = new Class;
+Animator.include({
+  init: function(){
+    this.amtArr = [];
+    this.step = 10;
+    this.timer = null;
+  },
+  add: function(el, arr){
+
+    //arr = [am, hl, cb]
+    var self = this,
+      amtArr = self.amtArr,
+      oldStatus = amtArr.length,
+      st = self.step,
+      cfg = el.cfg,
+      am = arr[0],
+      hl = to_i((arr[1]||500)/st),
+      cb = arr[2];
+
+    forEach(am, function(v, k){
+      switch(k){
+        case 'translate':
+          am[k] = {
+            st: [v[0]/hl, v[1]/hl],
+            src: [0, 0],
+            tar: v
+          };
+          break;
+        case 'rotate':
+          v[1]= v[1] || 0;
+          v[2] = v[2] || 0;
+          am[k] = {
+            st: [v[0]/hl, 0, 0],
+            src: [0, v[1], v[2]],
+            tar: v
+          };
+          break;
+        case 'scale':
+          v[1] = v[1] || v[0];
+          v[2] = v[2] || 0;
+          v[3] = v[3] || 0;
+          am[k] = {
+            st: [ (v[0]-1)/hl, (v[1]-1)/hl, 0, 0 ],
+            src: [1, 1, v[2], v[3]],
+            tar: v
+          };
+          break;
+        default:
+          if(v.indexOf('#') != -1){
+            //Todo：如果元素本身没有设置颜色，颜色是从上一级context继承的，那么这里不会获取到颜色
+            cfg[k] = hex2num(cfg[k] || '#fff');
+            v = hex2num(v);
+            am[k] = {
+              src: cfg[k],
+              st: [(v[0] - cfg[k][0])/hl, (v[1]-cfg[k][1])/hl, (v[2]-cfg[k][2])/hl],
+              tar: v
+            };
+            console.log(am[k]);
+          }else{
+            cfg[k] = cfg[k] || 0;
+            am[k] = {
+              src: cfg[k],
+              st: (v-cfg[k])/hl,
+              tar: v
+            };
+          }
+          break;
+      }
+    });
+    amtArr.push([el, am, hl, cb]);
+
+    if(oldStatus == 0){ //不为0则有action在执行
+      self.action();
+    }
+  },
+  abort: function(){
+    var self = this;
+    clearTimeout(self.timer);
+    self.amtArr = [];
+  },
+  action: function(){
+    var self = this,
+      amtArr = self.amtArr,
+      el,
+      am,
+      hl,
+      cb,
+      src,
+      st,
+      tar,
+      tem;
+
+    amtArr.forEach(function(v, i, a){
+      el = v[0];
+      am = v[1];
+      hl = v[2];
+      cb = v[3];
+      hl -= 1;
+      v[2] = hl;
+      el.matrix = [1, 0, 0, 1, 0, 0];
+      forEach(am, function(val, k){
+        src = val.src;
+        st = val.st;
+        tar = val.tar;
+        if(k.search(/scale|rotate|translate|transform/) != -1){
+          if(hl == 0){
+            el[k].apply(el, tar);
+          }else{
+            el[k].apply(el, src);
+          }
+          src.forEach(function(o, n, aa){
+            aa[n] += st[n];
+          });
+        }else if(k.search(/fillStyle|strokeStyle|shadowColor/) != -1){
+          tem = {};
+          tem[k] = rgb2hex.apply(this, src);
+          el.attr(tem);
+          src.forEach(function(o, n, aa){
+            aa[n] += st[n]
+          });
+        }else{
+          tem = {};
+          tem[k] = src;
+          el.attr(tem);
+          val.src += st;
+        }
+      });
+      if(hl == 0){
+        cb();
+        amtArr.splice(i, 1);
+      }
+    });
+    self.timer = setTimeout(function(){
+      self.checkStatus();
+    }, self.step);
+  },
+  checkStatus: function(){
+    var self = this;
+    if(self.amtArr.length !== 0){
+      self.action();
+    }
+  }
+});
+
+//主动画控制器
+var Sanimator = new Animator();/*!
     @Name: Paper
     @Type: Class
     @Info: 画布类，实例拥有各种绘图方法 一般通过SI方法new出实例
@@ -292,6 +496,7 @@ var Paper,
   Carc,
   Cellipse,
   Cpath,
+//TODO: T\S\H\V命令
   order2func = {
     'M': 'moveTo',
     'L': 'lineTo',
@@ -324,8 +529,7 @@ Paper.include({
     cn.style.position = 'absolute';
     self.width = cn.width = w;
     self.height = cn.height = h;
-    //TODO: id自更新
-    cn.id = 'c1';
+    cn.id = container_id + '_canvas';
     ct.appendChild(cn);
     self.container = ct;
     self.canvasNode = cn;
@@ -336,8 +540,8 @@ Paper.include({
   },
   /*
       初始化事件处理对象
-      TODO：鼠标进入canvas元素之后，只有mousemove事件。需要根据经过的元素，判断在各元素之间的over和out。
-      TODO: mousedown mouseup dbclick
+      TODO: mousedown mouseup dbclick drag
+      Todo: 事件冒泡
    */
   initEveHandler: function(){
     var self = this,
@@ -345,20 +549,31 @@ Paper.include({
       events = domEvents;
     self.eves = {};
     self.hasIn = [];
+    self.isDrag = false;
     events.forEach(function(event){
       self.eves[event] = new EvArray(self, event);
       node.addEventListener(event, function(e){
         var type = e.type,
           p, who, tem,
+          pos_now, pos_old,
           tem_over = [],
           tem_out = [],
           tem_move = [];
         if(type == 'mouseover' || type == 'mouseout') return;
         p = getEventPosition(e);
         who = self.whoHasThisPoint(p);
-        if(type == 'click'){
+        if(type.search(/click|mousedown|mouseup|dbclick/) != -1){
           if(who.length == 0) return;
-          self.eves['click'].handle(who, e);
+          if(type == 'mousedown'){
+            self.isDrag = who[who.length - 1];
+            self.isDrag.oldPos = getEventPosition(e);
+            //self.dragPos = getEventPosition(e)
+          }
+          if(type == 'mouseup') self.isDrag = false;
+          self.eves[type].handle(who, e);
+        }else if(type == 'mousemove' && self.isDrag){
+          //drag
+          self.eves['drag'].handle([self.isDrag], e);
         }else if(type == 'mousemove'){
           if(who.length != 0 && self.hasIn.length == 0){
             //over
@@ -428,6 +643,9 @@ Paper.include({
     }
     ctxt.clearRect(l, t, w, h);
   },
+  /*!Private
+      创建图形时初始化一些属性
+   */
   initShape: function(el){
     var self = this,
       els = self.allElements,
@@ -443,8 +661,12 @@ Paper.include({
       el[event] = function(func){
         eves[event].push({
           target: el,
+          type: event,
           handle: func
         });
+      };
+      el['un'+event] = function(func){
+        eves[event].delete(el, func);
       };
     });
     els.push(el);
@@ -574,6 +796,14 @@ Paper.include({
     el.pathJSON = json;
     return self.initShape(el);
   },
+  /*Private
+
+      清空画布 重绘一帧
+      whoHasThisPoint方法也通过render实现
+      重绘帧的过程中，对每个path使用isPointInPath方法
+      检查是否有该点
+
+   */
   render: function(check){
     var self = this,
       allElements = self.allElements,
@@ -674,14 +904,18 @@ Matrix.include({
   },
   translate: function(x, y){
     this.update(1, 0, 0, 1, x, y);
+    this.paper.refresh();
   },
   transform: function(a, b, c, d, e, f){
+    this.update(a, b, c, d, e, f);
+    this.paper.refresh();
   },
   scale: function(sx, sy, x, y){
     sy = sy || sx;
     (x || y) && this.update(1, 0, 0, 1, x, y);
     this.update(sx, 0, 0, sy, 0, 0);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
+    this.paper.refresh();
   },
   rotate: function(a, x, y){
     a = deg2rad(a);
@@ -691,11 +925,13 @@ Matrix.include({
       cosa = toFixed(cos(a), 9);
     this.update(cosa, sina, -sina, cosa, x, y);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
+    this.paper.refresh();
   }
 });
 
 /*!
-    TODO: 数据绑定
+    TODO: 同类元素的集合，通过集合改变属性、增删事件
+    @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
  */
 Celement = new Class(Matrix);
 Celement.include({
@@ -708,7 +944,8 @@ Celement.include({
     self.display = true;
     self.income = false;
     self.closeit = true;
-    self.cfg = {};
+    self.cfg = extend(true, {}, defaultCfg);
+    self.data = {};
   },
   setIncome: function(b){
     var self = this,
@@ -721,6 +958,14 @@ Celement.include({
       hasIn.splice(idx, 1);
     }
     self.income = b;
+  },
+  data: function(k, v){
+    var self = this;
+    if(isDefined(v)){
+      self.data[k] = v;
+      return self;
+    }
+    return self.data[k];
   },
   attr: function(cfg){
     var self = this;
@@ -772,6 +1017,9 @@ Celement.include({
     if(cfg.fillStyle != 'none'){
       ctx.fill();
     }
+  },
+  animate: function(/* obj, num, func */){
+    Sanimator.add(this, arguments);
   }
 });
 
@@ -858,7 +1106,6 @@ Cpath.include({
 });
 SI.Paper = Paper;
 SI.version = Version;
-window.SIVONA = window.SI = SI;
 window.SIVONA = window.SI = SI;
 
 }(window));
