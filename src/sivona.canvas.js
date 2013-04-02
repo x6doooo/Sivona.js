@@ -448,10 +448,12 @@ Matrix.include({
   translate: function(x, y){
     this.update(1, 0, 0, 1, x, y);
     this.paper.refresh();
+    return this;
   },
   transform: function(a, b, c, d, e, f){
     this.update(a, b, c, d, e, f);
     this.paper.refresh();
+    return this;
   },
   scale: function(sx, sy, x, y){
     sy = sy || sx;
@@ -459,6 +461,7 @@ Matrix.include({
     this.update(sx, 0, 0, sy, 0, 0);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
     this.paper.refresh();
+    return this;
   },
   rotate: function(a, x, y){
     a = deg2rad(a);
@@ -469,6 +472,7 @@ Matrix.include({
     this.update(cosa, sina, -sina, cosa, x, y);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
     this.paper.refresh();
+    return this;
   }
 });
 
