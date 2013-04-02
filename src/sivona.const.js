@@ -16,7 +16,8 @@ var PI = Math.PI,
     miterLimit: 0,
     font: '12px',
     textBaseline: 'middle',
-    textAlign: 'center'
+    textAlign: 'center',
+    globalAlpha: 1
   },
   sin = Math.sin,
   cos = Math.cos,
