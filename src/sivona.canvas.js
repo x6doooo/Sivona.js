@@ -205,6 +205,7 @@ Paper.include({
         width: w,
         height: h
       });
+    el.shapeType = 'rect';
     return self.initShape(el);
   },
   /*!
@@ -230,6 +231,7 @@ Paper.include({
         eAngle: eAngle * PI,
         counterclockwise: counterclockwise
       });
+    el.shapeType = 'arc';
     return self.initShape(el);
   },
   /*!
@@ -252,6 +254,7 @@ Paper.include({
         eAngle: 2 * PI,
         counterclockwise: false
       });
+    el.shapeType = 'circle';
     return self.initShape(el);
   },
   /*!
@@ -270,6 +273,7 @@ Paper.include({
       el = new Cellipse({
         x: x, y: y, xr: xr, yr: yr
       });
+    el.shapeType = 'ellipse';
     return self.initShape(el);
   },
   /*!
@@ -307,7 +311,33 @@ Paper.include({
       json = Cpath.parse(json);
     }
     el.pathJSON = json;
+    el.shapeType = 'path';
     return self.initShape(el);
+  },
+  clone: function(el){
+    var self = this,
+      tem = null,
+      cf = extend(true, {}, el);
+    switch(cf.shapeType){
+      case 'rect':
+        tem = new Crect(cf);
+        break;
+      case 'circle':
+      case 'arc':
+        tem = new Carc(cf);
+        break;
+      case 'ellipse':
+        tem = new Cellipse(cf);
+        break;
+      case 'path':
+        tem = new Cpath(cf);
+        break
+      default: break;
+    }
+    tem.attr(cf.cfg);
+    self.initShape(tem);
+    tem.zIndex = cf.zIndex;
+    return tem;
   },
   /*Private
 
