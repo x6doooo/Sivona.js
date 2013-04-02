@@ -167,6 +167,9 @@ Paper.include({
           handle: func
         });
       };
+      el['un'+event] = function(func){
+        eves[event].delete(el, func);
+      };
     });
     els.push(el);
     self.refresh();
