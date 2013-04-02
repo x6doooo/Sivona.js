@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title> Sivona.js Examples </title>
+	<script type="text/javascript" src="../../src/sivona.js"></script>
+</head>
+<body>
+	<div id="box"></div>
+	<script>
+		//初始化画布
+		paper = SI('box', 700, 700);
+
+		//设置一个原始矩形
+		o1 = paper.rect(50, 50, 100, 80);
+		//通过clone方法复制原始矩形 改成蓝色
+		t = paper.clone(o1).attr({'fillStyle': 'blue'});
+		//x轴平移80 y轴平移30
+		t.translate(80, 30);
+
+		o2 = paper.rect(50, 250, 100, 80);
+		r = paper.clone(o2).attr({'fillStyle': 'orange'});
+		//以(100, 290)为基准点，旋转45度
+		r.rotate(45, 100, 290);
+
+		o3 = paper.rect(50, 400, 100, 80);
+		s = paper.clone(o3).attr({'fillStyle': 'green'}).set('zIndex', 1);
+		//以(50, 400)为基准点，x轴缩放2倍 y轴缩放0.8倍
+		s.scale(2, 0.8, 100, 440);
+	</script>
+</body>
+</html>
+</body>
+</html>
