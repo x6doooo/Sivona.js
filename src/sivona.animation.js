@@ -31,6 +31,7 @@ Animator.include({
     this.timer = null;
     this.timeDiff = 1;
   },
+  // Todo: 增加一组元素的动画，只设置一个CallBack
   add: function(el, arr){
     //arr = [am, hl, cb]
     var self = this,
