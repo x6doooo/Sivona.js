@@ -14,7 +14,7 @@ var PI = Math.PI,
     lineCap: 'butt',
     lineJoin: 'miter',
     miterLimit: 0,
-    font: '12px',
+    font: '12px Arial',
     textBaseline: 'middle',
     textAlign: 'center',
     globalAlpha: 1
