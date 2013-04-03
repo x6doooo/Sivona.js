@@ -27,23 +27,18 @@ var Animator = new Class;
 Animator.include({
   init: function(){
     this.amtArr = [];
-    this.step = 1;
     this.stamp = null;
     this.timer = null;
     this.timeDiff = 1;
-    this.fps = 0;
-    this.timeCount = 0;
   },
   add: function(el, arr){
     //arr = [am, hl, cb]
     var self = this,
       amtArr = self.amtArr,
       oldStatus = amtArr.length,
-      hlt = arr[1]||500,
-      st = self.step,
+      hl = arr[1]||500,
       cfg = el.cfg,
       am = extend(true, {}, arr[0]),
-      hl = to_i(hlt/st),
       cb = arr[2] || function(){};
     forEach(am, function(v, k){
       if(k == 'translate'){
@@ -76,7 +71,7 @@ Animator.include({
           v = hex2num(v);
           am[k] = {
             src: cfg[k],
-            st: [(v[0] - cfg[k][0])/hl, (v[1]-cfg[k][1])/hl, (v[2]-cfg[k][2])/hl],
+            st: [(v[0] - cfg[k][0])/hl, (v[1] - cfg[k][1])/hl, (v[2] - cfg[k][2])/hl],
             tar: v
           };
         }else{
@@ -89,21 +84,19 @@ Animator.include({
         }
       }
     });
-    amtArr.push([el, am, hlt, cb, +new Date()]);
+    amtArr.push([el, am, hl, cb, +new Date()]);
     if(oldStatus == 0){ //不为0则有action在执行
-      self.stamp = +new Date();
       self.action();
     }
   },
   abort: function(){
     var self = this;
-    clearTimeout(self.timer);
     self.init();
   },
   action: function(){
     var self = this,
       amtArr = self.amtArr,
-      stamp = self.stamp,
+      td = self.timeDiff,
       el,
       am,
       hl,
@@ -111,52 +104,53 @@ Animator.include({
       src,
       st,
       tar,
-      tem;
-
+      tem,
+      pt,
+      done;
+    self.stamp = +new Date();
     amtArr.forEach(function(v, i){
       el = v[0];
       am = v[1];
       hl = v[2];
       cb = v[3];
       stime = v[4];
-      //hl -= 1;
-      v[2] = hl;
+      pt = (self.stamp - stime);
+      done = (hl <= pt);
       el.matrix = [1, 0, 0, 1, 0, 0];
       forEach(am, function(val, k){
         src = val.src;
         st = val.st;
         tar = val.tar;
         if(k.search(/scale|rotate|translate|transform/) != -1){
-          if(hl == 0){
+          if(done){
             el[k].apply(el, tar);
           }else{
             el[k].apply(el, src);
           }
           src.forEach(function(o, n, aa){
-            aa[n] += (st[n]*self.timeDiff);
+            aa[n] += (st[n] * td);
           });
         }else if(k.search(/fillStyle|strokeStyle|shadowColor/) != -1){
           tem = {};
           tem[k] = rgb2hex.apply(this, src);
           el.attr(tem);
           src.forEach(function(o, n, aa){
-            aa[n] += (st[n]*self.timeDiff);
+            aa[n] += (st[n] * td);
           });
         }else{
           tem = {};
           tem[k] = src;
           el.attr(tem);
-          val.src += (st*self.timeDiff);
+          val.src += (st * td);
         }
       });
-      if(hl <= (+new Date() - stime)){
+      if(done){
         amtArr.splice(i, 1);
         cb();
       }
     });
-    stamp = self.step - (+new Date() - stamp);
-    self.stamp = +new Date();
-    requestAnimationFrame(function(){
+    window.cancelAnimationFrame(self.timer);
+    self.timer = window.requestAnimationFrame(function(){
       self.timeDiff = (+new Date() - self.stamp);
       self.checkStatus();
     });
