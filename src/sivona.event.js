@@ -16,7 +16,7 @@ EvArray.include({
   },
   delete: function(el, func){
     this.els.forEach(function(v, i, a){
-      if(v.target == el && v.handle == func){
+      if(v.target == el && (func ? v.handle == func : true)){
         a.splice(i, 1);
       }
     });

@@ -182,7 +182,11 @@ Paper.include({
         });
       };
       el['un'+event] = function(func){
-        eves[event].delete(el, func);
+        if(func){
+          eves[event].delete(el, func);
+        }else{
+          eves[event].delete(el);
+        }
       };
     });
     els.push(el);
@@ -571,6 +575,14 @@ Celement.include({
   },
   animate: function(/* obj, num, func */){
     Sanimator.add(this, arguments);
+  },
+  //Todo: remove el remove event remove animate
+  remove: function(){
+    var self = this;
+    self.hide();
+    domEvents.forEach(function(event){
+      self['un'+event]();
+    });
   }
 });
 
