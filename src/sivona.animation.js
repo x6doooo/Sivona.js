@@ -64,9 +64,16 @@ Animator.include({
           src: [1, 1, v[2], v[3]],
           tar: v
         };
-      }else{
+      }else if(k == 'fillStyle' || k == 'strokeStyle'){
         cfg[k] = hex2num(cfg[k] || '#fff');
         v = hex2num(v);
+        am[k] = {
+          src: cfg[k],
+          st: [(v[0] - cfg[k][0])/hl, (v[1] - cfg[k][1])/hl, (v[2] - cfg[k][2])/hl],
+          tar: v
+        };
+      }else{
+        cfg[k] = cfg[k] || 0;
         am[k] = {
           src: cfg[k],
           st: [(v[0] - cfg[k][0])/hl, (v[1] - cfg[k][1])/hl, (v[2] - cfg[k][2])/hl],
