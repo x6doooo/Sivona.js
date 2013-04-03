@@ -580,6 +580,9 @@ Celement.include({
   remove: function(){
     var self = this;
     self.hide();
+    Sanimator.amtArr.forEach(function(v, i, a){
+      if(v[0] == self) a.splice(i, 1);
+    });
     domEvents.forEach(function(event){
       self['un'+event]();
     });
