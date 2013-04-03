@@ -205,7 +205,50 @@ var PI = Math.PI,
   },
   sin = Math.sin,
   cos = Math.cos,
-  tan = Math.tan;
+  tan = Math.tan,
+  webColors = {
+    aqua: '#0ff',
+    black: '#000',
+    blue: '#00f',
+    fuchsia: '#f0f',
+    gray: '#808080',
+    green: '#008000',
+    lime: '#0f0',
+    maroon: '#800000',
+    navy: '#000080',
+    olive: '#808000',
+    purple: '#800080',
+    red: '#f00',
+    silver: '#c0c0c0',
+    teal: '#008080',
+    white: '#fff',
+    yellow: '#ff0'
+  };
+
+(function() {
+  var lastTime = 0;
+  var vendors = ['webkit', 'moz', 'o', 'ms'];
+  for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+    window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+    window.cancelAnimationFrame =
+      window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+  }
+
+  if (!window.requestAnimationFrame)
+    window.requestAnimationFrame = function(callback, element) {
+      var currTime = new Date().getTime();
+      var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+      var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+        timeToCall);
+      lastTime = currTime + timeToCall;
+      return id;
+    };
+
+  if (!window.cancelAnimationFrame)
+    window.cancelAnimationFrame = function(id) {
+      clearTimeout(id);
+    };
+}());
 
 function deg2rad(d){
   return d * PI / 180;
@@ -217,13 +260,19 @@ function rad2deg(r){
 
 // hex2num('#369') => [51, 102, 153]
 function hex2num(v){
-  var arr = v.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function(m, r, g, b) {
-    return [parseInt(r + r, 16), parseInt(g + g, 16), parseInt(b + b, 16)];
+  if(v.search('#') == -1) v = webColors[v];
+  if(v.length == 4){
+    v = v.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function(m, r, g, b) {
+      return r + r + g + g + b + b;
+    });
+  }
+  v = v.replace(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i, function(m, r, g, b){
+    return [parseInt(r, 16), parseInt(g, 16), parseInt(b, 16)];
   }).split(',');
-  arr.forEach(function(v, i, a){
-    a[i] = to_i(v);
+  v.forEach(function(val, i, a){
+    a[i] = to_i(val);
   });
-  return arr;
+  return v;
 }
 
 // rgb2hex(51,102,153); => '#369'
@@ -238,6 +287,8 @@ function rgb2hex(r, g, b) {
     return v;
   }
 }
+
+
 
 
 var Version = 0.01,
@@ -277,7 +328,7 @@ EvArray.include({
   },
   delete: function(el, func){
     this.els.forEach(function(v, i, a){
-      if(v.target == el && v.handle == func){
+      if(v.target == el && (func ? v.handle == func : true)){
         a.splice(i, 1);
       }
     });
@@ -314,7 +365,6 @@ function getEventPosition(ev){
   }
   return {x: x, y: y};
 }
-
 /*
  matrix、attributes
  TODO:？？？ path  转换path描述？？？
@@ -344,85 +394,73 @@ var Animator = new Class;
 Animator.include({
   init: function(){
     this.amtArr = [];
-    this.step = 10;
+    this.stamp = null;
     this.timer = null;
+    this.timeDiff = 1;
   },
   add: function(el, arr){
-
     //arr = [am, hl, cb]
     var self = this,
       amtArr = self.amtArr,
       oldStatus = amtArr.length,
-      st = self.step,
+      hl = arr[1]||500,
       cfg = el.cfg,
-      am = arr[0],
-      hl = to_i((arr[1]||500)/st),
+      am = extend(true, {}, arr[0]),
       cb = arr[2] || function(){};
-
     forEach(am, function(v, k){
-      switch(k){
-        case 'translate':
-          am[k] = {
-            st: [v[0]/hl, v[1]/hl],
-            src: [0, 0],
-            tar: v
-          };
-          break;
-        case 'rotate':
-          v[1]= v[1] || 0;
-          v[2] = v[2] || 0;
-          am[k] = {
-            st: [v[0]/hl, 0, 0],
-            src: [0, v[1], v[2]],
-            tar: v
-          };
-          break;
-        case 'scale':
-          v[1] = v[1] || v[0];
-          v[2] = v[2] || 0;
-          v[3] = v[3] || 0;
-          am[k] = {
-            st: [ (v[0]-1)/hl, (v[1]-1)/hl, 0, 0 ],
-            src: [1, 1, v[2], v[3]],
-            tar: v
-          };
-          break;
-        default:
-          if(v.indexOf('#') != -1){
-            //Todo：如果元素本身没有设置颜色，颜色是从上一级context继承的，那么这里不会获取到颜色
-            cfg[k] = hex2num(cfg[k] || '#fff');
-            v = hex2num(v);
-            am[k] = {
-              src: cfg[k],
-              st: [(v[0] - cfg[k][0])/hl, (v[1]-cfg[k][1])/hl, (v[2]-cfg[k][2])/hl],
-              tar: v
-            };
-          }else{
-            cfg[k] = cfg[k] || 0;
-            am[k] = {
-              src: cfg[k],
-              st: (v-cfg[k])/hl,
-              tar: v
-            };
-          }
-          break;
+      if(k == 'translate'){
+        am[k] = {
+          st: [v[0]/hl, v[1]/hl],
+          src: [0, 0],
+          tar: v
+        };
+      }else if(k == 'rotate'){
+        v[1]= v[1] || 0;
+        v[2] = v[2] || 0;
+        am[k] = {
+          st: [v[0]/hl, 0, 0],
+          src: [0, v[1], v[2]],
+          tar: v
+        };
+      }else if(k == 'scale'){
+        v[1] = v[1] || v[0];
+        v[2] = v[2] || 0;
+        v[3] = v[3] || 0;
+        am[k] = {
+          st: [ (v[0]-1)/hl, (v[1]-1)/hl, 0, 0 ],
+          src: [1, 1, v[2], v[3]],
+          tar: v
+        };
+      }else if(k == 'fillStyle' || k == 'strokeStyle'){
+        cfg[k] = hex2num(cfg[k] || '#fff');
+        v = hex2num(v);
+        am[k] = {
+          src: cfg[k],
+          st: [(v[0] - cfg[k][0])/hl, (v[1] - cfg[k][1])/hl, (v[2] - cfg[k][2])/hl],
+          tar: v
+        };
+      }else{
+        cfg[k] = cfg[k] || 0;
+        am[k] = {
+          src: cfg[k],
+          st: [(v[0] - cfg[k][0])/hl, (v[1] - cfg[k][1])/hl, (v[2] - cfg[k][2])/hl],
+          tar: v
+        };
       }
     });
-    amtArr.push([el, am, hl, cb]);
-
+    amtArr.push([el, am, hl, cb, +new Date()]);
     if(oldStatus == 0){ //不为0则有action在执行
       self.action();
     }
   },
   abort: function(){
     var self = this;
-    clearTimeout(self.timer);
-    self.amtArr = [];
+    self.init();
   },
   action: function(){
     var self = this,
       amtArr = self.amtArr,
-      stamp = new Date(),
+      td = self.timeDiff,
       el,
       am,
       hl,
@@ -430,57 +468,63 @@ Animator.include({
       src,
       st,
       tar,
-      tem;
-
-    amtArr.forEach(function(v, i, a){
+      tem,
+      pt,
+      done;
+    self.stamp = +new Date();
+    amtArr.forEach(function(v, i){
       el = v[0];
       am = v[1];
       hl = v[2];
       cb = v[3];
-      hl -= 1;
-      v[2] = hl;
+      stime = v[4];
+      pt = (self.stamp - stime);
+      done = (hl <= pt);
       el.matrix = [1, 0, 0, 1, 0, 0];
       forEach(am, function(val, k){
         src = val.src;
         st = val.st;
         tar = val.tar;
         if(k.search(/scale|rotate|translate|transform/) != -1){
-          if(hl == 0){
+          if(done){
             el[k].apply(el, tar);
           }else{
             el[k].apply(el, src);
           }
           src.forEach(function(o, n, aa){
-            aa[n] += st[n];
+            aa[n] += (st[n] * td);
           });
         }else if(k.search(/fillStyle|strokeStyle|shadowColor/) != -1){
           tem = {};
           tem[k] = rgb2hex.apply(this, src);
           el.attr(tem);
           src.forEach(function(o, n, aa){
-            aa[n] += st[n]
+            aa[n] += (st[n] * td);
           });
         }else{
           tem = {};
           tem[k] = src;
           el.attr(tem);
-          val.src += st;
+          val.src += (st * td);
         }
       });
-      if(hl == 0){
+      if(done){
         amtArr.splice(i, 1);
         cb();
       }
     });
-    stamp = self.step - (new Date() - stamp);
-    self.timer = setTimeout(function(){
+    window.cancelAnimationFrame(self.timer);
+    self.timer = window.requestAnimationFrame(function(){
+      self.timeDiff = (+new Date() - self.stamp);
       self.checkStatus();
-    }, stamp);
+    });
   },
   checkStatus: function(){
     var self = this;
     if(self.amtArr.length !== 0){
       self.action();
+    }else{
+      self.init();
     }
   }
 });
@@ -670,7 +714,11 @@ Paper.include({
         });
       };
       el['un'+event] = function(func){
-        eves[event].delete(el, func);
+        if(func){
+          eves[event].delete(el, func);
+        }else{
+          eves[event].delete(el);
+        }
       };
     });
     els.push(el);
@@ -1059,6 +1107,17 @@ Celement.include({
   },
   animate: function(/* obj, num, func */){
     Sanimator.add(this, arguments);
+  },
+  //Todo: remove el remove event remove animate
+  remove: function(){
+    var self = this;
+    self.hide();
+    Sanimator.amtArr.forEach(function(v, i, a){
+      if(v[0] == self) a.splice(i, 1);
+    });
+    domEvents.forEach(function(event){
+      self['un'+event]();
+    });
   }
 });
 
