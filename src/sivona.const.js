@@ -23,6 +23,16 @@ var PI = Math.PI,
   cos = Math.cos,
   tan = Math.tan;
 
+requestAnimationFrame= (function(){
+  return window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function ( callback ) {
+      window.setTimeout( callback, 1000 / 60 );
+    }
+})();
 function deg2rad(d){
   return d * PI / 180;
 }
@@ -54,5 +64,7 @@ function rgb2hex(r, g, b) {
     return v;
   }
 }
+
+
 
 

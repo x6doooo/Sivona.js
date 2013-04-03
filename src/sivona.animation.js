@@ -27,23 +27,26 @@ var Animator = new Class;
 Animator.include({
   init: function(){
     this.amtArr = [];
-    this.step = 5;
+    this.step = 1;
     this.stamp = null;
     this.timer = null;
+    this.timeDiff = 1;
+    this.fps = 0;
+    this.timeCount = 0;
   },
   add: function(el, arr){
     //arr = [am, hl, cb]
     var self = this,
       amtArr = self.amtArr,
       oldStatus = amtArr.length,
+      hlt = arr[1]||500,
       st = self.step,
       cfg = el.cfg,
       am = extend(true, {}, arr[0]),
-      hl = to_i((arr[1]||500)/st),
+      hl = to_i(hlt/st),
       cb = arr[2] || function(){};
-
     forEach(am, function(v, k){
-      if(k == 'tanslate'){
+      if(k == 'translate'){
         am[k] = {
           st: [v[0]/hl, v[1]/hl],
           src: [0, 0],
@@ -86,7 +89,7 @@ Animator.include({
         }
       }
     });
-    amtArr.push([el, am, hl, cb]);
+    amtArr.push([el, am, hlt, cb, +new Date()]);
     if(oldStatus == 0){ //不为0则有action在执行
       self.stamp = +new Date();
       self.action();
@@ -95,7 +98,7 @@ Animator.include({
   abort: function(){
     var self = this;
     clearTimeout(self.timer);
-    self.amtArr = [];
+    self.init();
   },
   action: function(){
     var self = this,
@@ -115,7 +118,8 @@ Animator.include({
       am = v[1];
       hl = v[2];
       cb = v[3];
-      hl -= 1;
+      stime = v[4];
+      //hl -= 1;
       v[2] = hl;
       el.matrix = [1, 0, 0, 1, 0, 0];
       forEach(am, function(val, k){
@@ -129,32 +133,33 @@ Animator.include({
             el[k].apply(el, src);
           }
           src.forEach(function(o, n, aa){
-            aa[n] += st[n];
+            aa[n] += (st[n]*self.timeDiff);
           });
         }else if(k.search(/fillStyle|strokeStyle|shadowColor/) != -1){
           tem = {};
           tem[k] = rgb2hex.apply(this, src);
           el.attr(tem);
           src.forEach(function(o, n, aa){
-            aa[n] += st[n]
+            aa[n] += (st[n]*self.timeDiff);
           });
         }else{
           tem = {};
           tem[k] = src;
           el.attr(tem);
-          val.src += st;
+          val.src += (st*self.timeDiff);
         }
       });
-      if(hl == 0){
+      if(hl <= (+new Date() - stime)){
         amtArr.splice(i, 1);
         cb();
       }
     });
-    stamp = self.step - (new Date() - stamp);
+    stamp = self.step - (+new Date() - stamp);
     self.stamp = +new Date();
-    self.timer = setTimeout(function(){
+    requestAnimationFrame(function(){
+      self.timeDiff = (+new Date() - self.stamp);
       self.checkStatus();
-    }, stamp);
+    });
   },
   checkStatus: function(){
     var self = this;
