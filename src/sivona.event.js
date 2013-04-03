@@ -53,4 +53,3 @@ function getEventPosition(ev){
   }
   return {x: x, y: y};
 }
-
