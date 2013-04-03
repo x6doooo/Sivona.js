@@ -59,6 +59,7 @@ Paper.include({
       Todo: image
       Todo: clip
       Todo: pattern
+      Todo: group 将多个图形设置成组
    */
   initEveHandler: function(){
     var self = this,
@@ -192,6 +193,17 @@ Paper.include({
     els.push(el);
     self.refresh();
     return el;
+  },
+  text: function(t, x, y, w){
+    var self = this,
+      el = new Ctext({
+        text: t,
+        x: x,
+        y: y,
+        textWidth: w
+      });
+    el.shapeType = 'text';
+    return self.initShape(el);
   },
   /*!
       @Name: paper.rect(x, y, w, h)
@@ -589,6 +601,25 @@ Celement.include({
     domEvents.forEach(function(event){
       self['un'+event]();
     });
+  }
+});
+
+Ctext = new Class(Celement);
+Ctext.include({
+  draw: function(){
+    var self = this,
+      ctx = self.context,
+      txt = self.text,
+      w = self.textWidth;
+    if(!w){
+      w = ctx.measureText(txt).width;
+    }
+    if(self.cfg.lineWidth == 0){
+      console.log(1);
+      ctx.strokeText(txt, self.x, self.y, w);
+    }else{
+      ctx.fillText(txt, self.x, self.y, w);
+    }
   }
 });
 
