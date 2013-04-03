@@ -65,23 +65,13 @@ Animator.include({
           tar: v
         };
       }else{
-        if(v.indexOf('#') != -1){
-          //Todo：如果元素本身没有设置颜色，颜色是从上一级context继承的，那么这里不会获取到颜色
-          cfg[k] = hex2num(cfg[k] || '#fff');
-          v = hex2num(v);
-          am[k] = {
-            src: cfg[k],
-            st: [(v[0] - cfg[k][0])/hl, (v[1] - cfg[k][1])/hl, (v[2] - cfg[k][2])/hl],
-            tar: v
-          };
-        }else{
-          cfg[k] = cfg[k] || 0;
-          am[k] = {
-            src: cfg[k],
-            st: (v-cfg[k])/hl,
-            tar: v
-          };
-        }
+        cfg[k] = hex2num(cfg[k] || '#fff');
+        v = hex2num(v);
+        am[k] = {
+          src: cfg[k],
+          st: [(v[0] - cfg[k][0])/hl, (v[1] - cfg[k][1])/hl, (v[2] - cfg[k][2])/hl],
+          tar: v
+        };
       }
     });
     amtArr.push([el, am, hl, cb, +new Date()]);
