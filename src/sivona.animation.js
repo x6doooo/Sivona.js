@@ -27,73 +27,68 @@ var Animator = new Class;
 Animator.include({
   init: function(){
     this.amtArr = [];
-    this.step = 10;
+    this.step = 5;
+    this.stamp = null;
     this.timer = null;
   },
   add: function(el, arr){
-
     //arr = [am, hl, cb]
     var self = this,
       amtArr = self.amtArr,
       oldStatus = amtArr.length,
       st = self.step,
       cfg = el.cfg,
-      am = arr[0],
+      am = extend(true, {}, arr[0]),
       hl = to_i((arr[1]||500)/st),
       cb = arr[2] || function(){};
 
     forEach(am, function(v, k){
-      switch(k){
-        case 'translate':
+      if(k == 'tanslate'){
+        am[k] = {
+          st: [v[0]/hl, v[1]/hl],
+          src: [0, 0],
+          tar: v
+        };
+      }else if(k == 'rotate'){
+        v[1]= v[1] || 0;
+        v[2] = v[2] || 0;
+        am[k] = {
+          st: [v[0]/hl, 0, 0],
+          src: [0, v[1], v[2]],
+          tar: v
+        };
+      }else if(k == 'scale'){
+        v[1] = v[1] || v[0];
+        v[2] = v[2] || 0;
+        v[3] = v[3] || 0;
+        am[k] = {
+          st: [ (v[0]-1)/hl, (v[1]-1)/hl, 0, 0 ],
+          src: [1, 1, v[2], v[3]],
+          tar: v
+        };
+      }else{
+        if(v.indexOf('#') != -1){
+          //Todo：如果元素本身没有设置颜色，颜色是从上一级context继承的，那么这里不会获取到颜色
+          cfg[k] = hex2num(cfg[k] || '#fff');
+          v = hex2num(v);
           am[k] = {
-            st: [v[0]/hl, v[1]/hl],
-            src: [0, 0],
+            src: cfg[k],
+            st: [(v[0] - cfg[k][0])/hl, (v[1]-cfg[k][1])/hl, (v[2]-cfg[k][2])/hl],
             tar: v
           };
-          break;
-        case 'rotate':
-          v[1]= v[1] || 0;
-          v[2] = v[2] || 0;
+        }else{
+          cfg[k] = cfg[k] || 0;
           am[k] = {
-            st: [v[0]/hl, 0, 0],
-            src: [0, v[1], v[2]],
+            src: cfg[k],
+            st: (v-cfg[k])/hl,
             tar: v
           };
-          break;
-        case 'scale':
-          v[1] = v[1] || v[0];
-          v[2] = v[2] || 0;
-          v[3] = v[3] || 0;
-          am[k] = {
-            st: [ (v[0]-1)/hl, (v[1]-1)/hl, 0, 0 ],
-            src: [1, 1, v[2], v[3]],
-            tar: v
-          };
-          break;
-        default:
-          if(v.indexOf('#') != -1){
-            //Todo：如果元素本身没有设置颜色，颜色是从上一级context继承的，那么这里不会获取到颜色
-            cfg[k] = hex2num(cfg[k] || '#fff');
-            v = hex2num(v);
-            am[k] = {
-              src: cfg[k],
-              st: [(v[0] - cfg[k][0])/hl, (v[1]-cfg[k][1])/hl, (v[2]-cfg[k][2])/hl],
-              tar: v
-            };
-          }else{
-            cfg[k] = cfg[k] || 0;
-            am[k] = {
-              src: cfg[k],
-              st: (v-cfg[k])/hl,
-              tar: v
-            };
-          }
-          break;
+        }
       }
     });
     amtArr.push([el, am, hl, cb]);
-
     if(oldStatus == 0){ //不为0则有action在执行
+      self.stamp = +new Date();
       self.action();
     }
   },
@@ -105,6 +100,7 @@ Animator.include({
   action: function(){
     var self = this,
       amtArr = self.amtArr,
+      stamp = self.stamp,
       el,
       am,
       hl,
@@ -114,7 +110,7 @@ Animator.include({
       tar,
       tem;
 
-    amtArr.forEach(function(v, i, a){
+    amtArr.forEach(function(v, i){
       el = v[0];
       am = v[1];
       hl = v[2];
@@ -154,14 +150,18 @@ Animator.include({
         cb();
       }
     });
+    stamp = self.step - (new Date() - stamp);
+    self.stamp = +new Date();
     self.timer = setTimeout(function(){
       self.checkStatus();
-    }, self.step);
+    }, stamp);
   },
   checkStatus: function(){
     var self = this;
     if(self.amtArr.length !== 0){
       self.action();
+    }else{
+      self.init();
     }
   }
 });

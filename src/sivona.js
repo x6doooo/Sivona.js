@@ -1,6 +1,6 @@
 /*!
 
-  @Tile: Sivona v0.01
+  @Title: Sivona v0.01
   @Link: https://github.com/x6doooo/Sivona.js
   @Copyright: Copyright 2013 Dx. Yang
   @License: Released under the MIT license
@@ -93,18 +93,18 @@ function extend(){
 }
 
 /*!
-  Class
+  @Name: Class
   @Info: OOP封装
   @Type: Class
 
   @Params:
-  - parent {contructor} 父类（可选）
+  - parent {constructor} 父类（可选）
 
   @Return: {Class}
 
   ***
 
-  Class.extend
+  @Name: Class.extend
   @Info: 给类增加方法
   @Type: Method
   @Params:
@@ -112,7 +112,7 @@ function extend(){
 
   ***
 
-  Class.include
+  @Name: Class.include
   @Info: 给原型增加方法
   @Type: Method
   @Params:
@@ -422,6 +422,7 @@ Animator.include({
   action: function(){
     var self = this,
       amtArr = self.amtArr,
+      stamp = new Date(),
       el,
       am,
       hl,
@@ -471,9 +472,10 @@ Animator.include({
         cb();
       }
     });
+    stamp = self.step - (new Date() - stamp);
     self.timer = setTimeout(function(){
       self.checkStatus();
-    }, self.step);
+    }, stamp);
   },
   checkStatus: function(){
     var self = this;
@@ -540,8 +542,11 @@ Paper.include({
   },
   /*
       初始化事件处理对象
-      TODO: mousedown mouseup dbclick drag
       Todo: 事件冒泡
+      Todo: 泛光效果
+      Todo: image
+      Todo: clip
+      Todo: pattern
    */
   initEveHandler: function(){
     var self = this,
@@ -964,6 +969,7 @@ Matrix.include({
 
 /*!
     TODO: 同类元素的集合，通过集合改变属性、增删事件
+    Todo: text绘制方法
     @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
  */
 Celement = new Class(Matrix);
