@@ -84,18 +84,18 @@ function extend(){
 }
 
 /*!
-  Class
+  @Name: Class
   @Info: OOP封装
   @Type: Class
 
   @Params:
-  - parent {contructor} 父类（可选）
+  - parent {constructor} 父类（可选）
 
   @Return: {Class}
 
   ***
 
-  Class.extend
+  @Name: Class.extend
   @Info: 给类增加方法
   @Type: Method
   @Params:
@@ -103,7 +103,7 @@ function extend(){
 
   ***
 
-  Class.include
+  @Name: Class.include
   @Info: 给原型增加方法
   @Type: Method
   @Params:
