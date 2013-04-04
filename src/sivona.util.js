@@ -125,7 +125,7 @@ function extend(){
     Son = new Class(Dad);
     Son.inlcude({
       look: function(){ //覆盖父类的方法
-        this.supr();  //调用父类的同名方法 和其他语言的super功能相似
+        this._super();  //调用父类的同名方法 和其他语言的super功能相似
         ...
       }
     });
@@ -165,7 +165,7 @@ var Class = function(parent){
     this[k] = v;
     return this;
   };
-  _class.prototype.supr = function(){
+  _class.prototype._super = function(){
     arguments.callee.caller.spfunc.apply(this, arguments);
   };
   return _class;

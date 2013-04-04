@@ -504,7 +504,7 @@ Celement = new Class(Matrix);
 Celement.include({
   init: function(){
     var self = this;
-    self.supr();
+    self._super();
     forEach(arguments[0], function(v, k){
       self[k] = v;
     })
