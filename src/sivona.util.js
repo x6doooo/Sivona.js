@@ -73,7 +73,6 @@ function extend(){
         }else{
           clone = isEmptyObject(src) ? {} : src;
         }
-        console.log(copy);
         target[name] = extend(deep, clone, copy);
       }else{
         target[name] = ops[name];
