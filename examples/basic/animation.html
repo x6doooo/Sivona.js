@@ -10,24 +10,41 @@
 	<script>
 		paper = SI('box', 700, 700);
 
-		circle = paper.circle(50, 50, 10).attr({'fillStyle': '#f00', 'lineWidth': 0});
-
 		//设置动画目标
-		target = {
-			'fillStyle': '#369',
-			'scale': [3, 3]
+		t1 = {
+			'fillStyle': 'teal',
+			'scale': [4, 4]
+		};
+
+		t2 = {
+			'fillStyle': '#ff0',
+			'scale': [0.25, 0.25]
 		};
 
 		//设置动画时长
-		time = 500;
+		time = 1000;
+
+		start();
 
 		//设置回调函数
-		function callback(){
-			console.log('done');
+		function f1(){
+
+			c1.remove();
+			c2.remove();
+
+			window.start();
+
 		}
 
 		//注册动画
-		circle.animate(target, time, callback);
+		function start(){
+			c1 = paper.circle(50, 50, 10);
+			c1.attr({'fillStyle': '#ff0', 'lineWidth': 0});
+			c1.animate(t1, time, f1);
+			c2 = paper.circle(200, 200, 40);
+			c2.attr({'fillStyle': 'teal', 'lineWidth': 0});
+			c2.animate(t2, time);
+		}
 
 	</script>
 </body>
