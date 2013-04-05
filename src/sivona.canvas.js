@@ -610,15 +610,10 @@ Ctext.include({
     var self = this,
       ctx = self.context,
       txt = self.text,
-      w = self.textWidth;
-    if(!w){
-      w = ctx.measureText(txt).width;
-    }
-    if(self.cfg.lineWidth == 0){
-      console.log(1);
+      w = self.textWidth || ctx.measureText(txt).width;
+    ctx.fillText(txt, self.x, self.y, w);
+    if(self.cfg.lineWidth != 0){
       ctx.strokeText(txt, self.x, self.y, w);
-    }else{
-      ctx.fillText(txt, self.x, self.y, w);
     }
   }
 });
