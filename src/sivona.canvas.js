@@ -85,7 +85,6 @@ Paper.include({
           if(type == 'mousedown'){
             self.isDrag = who[who.length - 1];
             self.isDrag.oldPos = getEventPosition(e);
-            //self.dragPos = getEventPosition(e)
           }
           if(type == 'mouseup') self.isDrag = false;
           self.eves[type].handle(who, e);
