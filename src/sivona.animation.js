@@ -3,6 +3,8 @@
  TODO:？？？ path  转换path描述？？？
  Todo: 多个canvas同时执行动画 test
  Todo: 中断动画 test
+ Todo: 中断某个元素的动画
+ Todo: 暂停和继续
 
     animator = new Animator();
 
