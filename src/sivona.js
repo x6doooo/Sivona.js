@@ -82,7 +82,6 @@ function extend(){
         }else{
           clone = isEmptyObject(src) ? {} : src;
         }
-        console.log(copy);
         target[name] = extend(deep, clone, copy);
       }else{
         target[name] = ops[name];
@@ -135,7 +134,7 @@ function extend(){
     Son = new Class(Dad);
     Son.inlcude({
       look: function(){ //覆盖父类的方法
-        this.supr();  //调用父类的同名方法 和其他语言的super功能相似
+        this._super();  //调用父类的同名方法 和其他语言的super功能相似
         ...
       }
     });
@@ -175,7 +174,7 @@ var Class = function(parent){
     this[k] = v;
     return this;
   };
-  _class.prototype.supr = function(){
+  _class.prototype._super = function(){
     arguments.callee.caller.spfunc.apply(this, arguments);
   };
   return _class;
@@ -1037,7 +1036,7 @@ Celement = new Class(Matrix);
 Celement.include({
   init: function(){
     var self = this;
-    self.supr();
+    self._super();
     forEach(arguments[0], function(v, k){
       self[k] = v;
     })
@@ -1143,15 +1142,10 @@ Ctext.include({
     var self = this,
       ctx = self.context,
       txt = self.text,
-      w = self.textWidth;
-    if(!w){
-      w = ctx.measureText(txt).width;
-    }
-    if(self.cfg.lineWidth == 0){
-      console.log(1);
+      w = self.textWidth || ctx.measureText(txt).width;
+    ctx.fillText(txt, self.x, self.y, w);
+    if(self.cfg.lineWidth != 0){
       ctx.strokeText(txt, self.x, self.y, w);
-    }else{
-      ctx.fillText(txt, self.x, self.y, w);
     }
   }
 });
