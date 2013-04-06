@@ -1,7 +1,7 @@
 # Sivona.js
 ===
 
-Sivona.js是一个HTML5 Canvas 2D绘制类库，包括形状绘制、事件处理、动画控制等功能。Sivona.js将HTML5 Canvas的接口进行了一系列封装，让Canvas绘图变得像操作DOM元素一样简单、便捷，更符合Web前端人员的开发习惯。
+Sivona.js是HTML5 Canvas 2D绘制类库，包括形状绘制、样式修改、事件处理、动画控制等功能。Sivona.js封装了HTML5 Canvas的接口，目的是让Canvas绘图变得像操作DOM元素一样简单、便捷，更符合Web前端工程师的开发习惯。
 
 ===
 
