@@ -15,5 +15,9 @@ var Version = 0.01,
   */
   SI = function(id, w, h){
     return new SI.Paper(id, w, h);
-  };
+  },
+  _uniqId = 0;
+
+
+
 
