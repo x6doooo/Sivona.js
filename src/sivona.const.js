@@ -78,7 +78,3 @@ function rgb2hex(r, g, b) {
     return v;
   }
 }
-
-
-
-

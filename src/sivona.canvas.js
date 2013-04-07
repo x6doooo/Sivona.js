@@ -60,6 +60,7 @@ Paper.include({
       Todo: clip
       Todo: pattern
       Todo: group 将多个图形设置成组
+      Todo: drag方法不触发click
    */
   initEveHandler: function(){
     var self = this,
