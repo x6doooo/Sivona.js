@@ -25,6 +25,36 @@
     el.animate({}, function(){});
 
  */
+(function() {
+  var lastTime = 0,
+    vendors = ['webkit', 'moz', 'o', 'ms'],
+    x,
+    l,
+    currTime,
+    timeToCall,
+    id;
+  for(x = 0, l = vendors.length; x < l && !window.requestAnimationFrame; ++x) {
+    SI.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+    SI.cancelAnimationFrame =
+      window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+  }
+
+  if (!SI.requestAnimationFrame)
+    SI.requestAnimationFrame = function(callback, element) {
+      currTime = new Date().getTime();
+      timeToCall = Math.max(0, 16 - (currTime - lastTime));
+      id = window.setTimeout(function() { callback(currTime + timeToCall); },
+        timeToCall);
+      lastTime = currTime + timeToCall;
+      return id;
+    };
+
+  if (!SI.cancelAnimationFrame)
+    SI.cancelAnimationFrame = function(id) {
+      clearTimeout(id);
+    };
+}());
+
 
 var Animator = new Class;
 Animator.include({
@@ -159,8 +189,8 @@ Animator.include({
         cb();
       }
     });
-    window.cancelAnimationFrame(self.timer);
-    self.timer = window.requestAnimationFrame(function(){
+    SI.cancelAnimationFrame(self.timer);
+    self.timer = SI.requestAnimationFrame(function(){
       self.timeDiff = (+new Date() - self.stamp);
       self.checkStatus();
     });
