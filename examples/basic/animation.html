@@ -6,6 +6,8 @@
 	<script type="text/javascript" src="../../src/sivona.js"></script>
 </head>
 <body>
+	<button>开始</button>
+	<button>结束</button>
 	<div id="box"></div>
 	<script>
 		paper = SI('box', 700, 700);
@@ -24,20 +26,27 @@
 		//设置动画时长
 		time = 1000;
 
-		start();
+		btns = document.getElementsByTagName('button');
+		startBtn = btns[0];
+		stopBtn = btns[1];
+
+		startBtn.onclick = start;
+		stopBtn.onclick = function(){
+			SI.animationController.abort();
+		};
+
 
 		//设置回调函数
 		function f1(){
-
-			c1.remove();
-			c2.remove();
-
 			window.start();
-
 		}
 
 		//注册动画
 		function start(){
+			if(typeof c1 !== 'undefined'){
+				c1.remove();
+				c2.remove();
+			}
 			c1 = paper.circle(50, 50, 10);
 			c1.attr({'fillStyle': '#ff0', 'lineWidth': 0});
 			c1.animate(t1, time, f1);
