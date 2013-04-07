@@ -585,7 +585,7 @@ Celement.include({
     }
   },
   animate: function(/* obj, num, func */){
-    Sanimator.add(this, arguments);
+    return Sanimator.add(this, arguments);
   },
   //Todo: remove el remove event remove animate
   remove: function(){

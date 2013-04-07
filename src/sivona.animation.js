@@ -25,6 +25,7 @@
     el.animate({}, function(){});
 
  */
+
 var Animator = new Class;
 Animator.include({
   init: function(){
@@ -39,6 +40,7 @@ Animator.include({
     var self = this,
       amtArr = self.amtArr,
       oldStatus = amtArr.length,
+      _id = 'ani_' + getUniqId(),
       hl = arr[1]||500,
       cfg = el.cfg,
       am = extend(true, {}, arr[0]),
@@ -84,10 +86,18 @@ Animator.include({
         };
       }
     });
-    amtArr.push([el, am, hl, cb, +new Date()]);
+    amtArr.push([el, am, hl, cb, +new Date(), _id]);
     if(oldStatus == 0){ //不为0则有action在执行
       self.action();
     }
+    return _id;
+  },
+  remove: function(_id){
+    var self = this,
+      amtArr = self.amtArr;
+    amtArr.forEach(function(v, i, a){
+      if(v[5] == _id) a.splice(i, 1);
+    });
   },
   abort: function(){
     var self = this;
