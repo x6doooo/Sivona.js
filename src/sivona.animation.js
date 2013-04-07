@@ -176,4 +176,4 @@ Animator.include({
 });
 
 //主动画控制器
-var Sanimator = new Animator();
+var sanimator = new Animator();

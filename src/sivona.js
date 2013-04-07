@@ -466,6 +466,13 @@ Animator.include({
     }
     return _id;
   },
+  remove: function(_id){
+    var self = this,
+      amtArr = self.amtArr;
+    amtArr.forEach(function(v, i, a){
+      if(v[5] == _id) a.splice(i, 1);
+    });
+  },
   abort: function(){
     var self = this;
     self.init();
@@ -543,7 +550,7 @@ Animator.include({
 });
 
 //主动画控制器
-var Sanimator = new Animator();/*!
+var sanimator = new Animator();/*!
     @Name: Paper
     @Type: Class
     @Info: 画布类，实例拥有各种绘图方法 一般通过SI方法new出实例
@@ -1130,7 +1137,7 @@ Celement.include({
     }
   },
   animate: function(/* obj, num, func */){
-    return Sanimator.add(this, arguments);
+    return sanimator.add(this, arguments);
   },
   //Todo: remove el remove event remove animate
   remove: function(){
@@ -1139,7 +1146,7 @@ Celement.include({
     self.paper.allElements.forEach(function(v, i, a){
       if(v == self) a.splice(i, 1);
     });
-    Sanimator.amtArr.forEach(function(v, i, a){
+    sanimator.amtArr.forEach(function(v, i, a){
       if(v[0] == self) a.splice(i, 1);
     });
     domEvents.forEach(function(event){
@@ -1245,6 +1252,7 @@ Cpath.include({
 });
 SI.Paper = Paper;
 SI.version = Version;
+SI.animationController = sanimator;
 window.SIVONA = window.SI = SI;
 
 }(window));

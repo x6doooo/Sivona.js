@@ -585,7 +585,7 @@ Celement.include({
     }
   },
   animate: function(/* obj, num, func */){
-    return Sanimator.add(this, arguments);
+    return sanimator.add(this, arguments);
   },
   //Todo: remove el remove event remove animate
   remove: function(){
@@ -594,7 +594,7 @@ Celement.include({
     self.paper.allElements.forEach(function(v, i, a){
       if(v == self) a.splice(i, 1);
     });
-    Sanimator.amtArr.forEach(function(v, i, a){
+    sanimator.amtArr.forEach(function(v, i, a){
       if(v[0] == self) a.splice(i, 1);
     });
     domEvents.forEach(function(event){
