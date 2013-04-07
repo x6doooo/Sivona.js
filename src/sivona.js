@@ -91,6 +91,10 @@ function extend(){
   return target;
 }
 
+function getUniqId(){
+  return _uniqId++;
+}
+
 /*!
   @Name: Class
   @Info: OOP封装
@@ -307,7 +311,11 @@ var Version = 0.01,
   */
   SI = function(id, w, h){
     return new SI.Paper(id, w, h);
-  };
+  },
+  _uniqId = 0;
+
+
+
 
 var EvArray,
   domEvents = ['click', 'mouseover', 'mouseout', 'mousemove', 'mousedown', 'mouseup', 'drag'];
@@ -369,6 +377,8 @@ function getEventPosition(ev){
  TODO:？？？ path  转换path描述？？？
  Todo: 多个canvas同时执行动画 test
  Todo: 中断动画 test
+ Todo: 中断某个元素的动画
+ Todo: 暂停和继续
 
     animator = new Animator();
 
@@ -389,6 +399,7 @@ function getEventPosition(ev){
     el.animate({}, function(){});
 
  */
+
 var Animator = new Class;
 Animator.include({
   init: function(){
@@ -403,6 +414,7 @@ Animator.include({
     var self = this,
       amtArr = self.amtArr,
       oldStatus = amtArr.length,
+      _id = 'ani_' + getUniqId(),
       hl = arr[1]||500,
       cfg = el.cfg,
       am = extend(true, {}, arr[0]),
@@ -448,10 +460,11 @@ Animator.include({
         };
       }
     });
-    amtArr.push([el, am, hl, cb, +new Date()]);
+    amtArr.push([el, am, hl, cb, +new Date(), _id]);
     if(oldStatus == 0){ //不为0则有action在执行
       self.action();
     }
+    return _id;
   },
   abort: function(){
     var self = this;
@@ -617,7 +630,6 @@ Paper.include({
           if(type == 'mousedown'){
             self.isDrag = who[who.length - 1];
             self.isDrag.oldPos = getEventPosition(e);
-            //self.dragPos = getEventPosition(e)
           }
           if(type == 'mouseup') self.isDrag = false;
           self.eves[type].handle(who, e);
@@ -1118,7 +1130,7 @@ Celement.include({
     }
   },
   animate: function(/* obj, num, func */){
-    Sanimator.add(this, arguments);
+    return Sanimator.add(this, arguments);
   },
   //Todo: remove el remove event remove animate
   remove: function(){
