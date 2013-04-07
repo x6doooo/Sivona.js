@@ -1,7 +1,6 @@
-var EvArray,
+var EvArray = new Class,
   domEvents = ['click', 'mouseover', 'mouseout', 'mousemove', 'mousedown', 'mouseup', 'drag'];
 
-EvArray = new Class;
 EvArray.include({
   init: function(paper, event){
     this.els = [];
