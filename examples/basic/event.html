@@ -9,7 +9,12 @@
 	<div id="box"></div>
 	<script>
 
-		//Todo: event
+		paper = SI('box', 700, 700);
+		rect = paper.rect(10, 10, 320, 240);
+		rect.click(function(){
+			alert(1);
+		});
+		rect.drag();
 
 	</script>
 </body>
