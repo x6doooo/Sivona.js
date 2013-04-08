@@ -306,6 +306,8 @@ Paper.include({
 
    pathString = "Mx,yLx,y..."
 
+   Todo: 小写 相对位置
+
    pathJSON = [
     {type:'moveTo', points: [x, y]},
     {type:'lineTo', points: [x, y]},
