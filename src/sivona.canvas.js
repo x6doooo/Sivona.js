@@ -499,7 +499,6 @@ Matrix.include({
 });
 
 /*!
-    Todo: text绘制方法
     @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
  */
 Celement = new Class(Matrix);
@@ -697,12 +696,12 @@ Cpath.extend({
         points[0] = points[0]*1 + lastX;
         points[1] = points[1]*1 + lastY;
         if(points.length > 2){
-          points[2] = points[2]*1 + lastX;//points[0];
-          points[3] = points[3]*1 + lastY;//points[1];
+          points[2] = points[2]*1 + lastX;
+          points[3] = points[3]*1 + lastY;
         }
         if(points.length > 4){
-          points[4] = points[4]*1 + lastX;//points[2];
-          points[5] = points[5]*1 + lastY;//points[3];
+          points[4] = points[4]*1 + lastX;
+          points[5] = points[5]*1 + lastY;
         }
         type = type.toUpperCase();
       }
@@ -730,7 +729,6 @@ Cpath.extend({
       };
       arr.push(tem)
     });
-    console.log(arr);
     return arr;
   }
 });
