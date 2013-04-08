@@ -561,7 +561,7 @@ var Paper,
   Carc,
   Cellipse,
   Cpath,
-//TODO: T\S\H\V命令
+//TODO: T\S命令
   order2func = {
     'M': 'moveTo',
     'L': 'lineTo',
@@ -569,7 +569,8 @@ var Paper,
     'C': 'bezierCurveTo',
     'Z': 'closePath'
   },
-  regodr = /[MLQCZ]/g;
+  regodr = /[MLQCZHV]/gi;
+  regodr_lower = /[mlqc]/g;
 
 Paper = new Class;
 Paper.include({
@@ -857,8 +858,6 @@ Paper.include({
 
    pathString = "Mx,yLx,y..."
 
-   Todo: 小写 相对位置
-
    pathJSON = [
     {type:'moveTo', points: [x, y]},
     {type:'lineTo', points: [x, y]},
@@ -1049,7 +1048,6 @@ Matrix.include({
 });
 
 /*!
-    Todo: text绘制方法
     @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
  */
 Celement = new Class(Matrix);
@@ -1218,12 +1216,65 @@ Cpath.extend({
     str = str.split('|');
     var arr = [],
       tem = {},
-      ps = [];
+      ps = [],
+      type,
+      points,
+      last_points,
+      len,
+      lastX,
+      lastY;
     str.forEach(function(v, i, a){
       if(v == '') return;
+      type = v.match(regodr)[0];
+
+      if(type == 'z'){
+        type = type.toUpperCase();
+        return;
+      }
+
+      points = v.replace(regodr, '').replace(/\b\-/g, ',-').split(',');
+
+      if(arr.length !== 0){
+        last_points = arr[arr.length-1].points;
+        len = last_points.length;
+        lastX = last_points[len-2]*1;
+        lastY = last_points[len-1]*1;
+      }
+
+      if(type.search(regodr_lower) !== -1){
+        points[0] = points[0]*1 + lastX;
+        points[1] = points[1]*1 + lastY;
+        if(points.length > 2){
+          points[2] = points[2]*1 + lastX;
+          points[3] = points[3]*1 + lastY;
+        }
+        if(points.length > 4){
+          points[4] = points[4]*1 + lastX;
+          points[5] = points[5]*1 + lastY;
+        }
+        type = type.toUpperCase();
+      }
+
+      if(type == 'H' || type == 'h'){
+        points[1] = lastY;
+        if(type == 'h'){
+          points[0] = points[0]*1 + lastX;
+        }
+        type = 'L';
+      }
+
+      if(type == 'V' || type == 'v'){
+        points[1] = points[0];
+        if(type == 'v'){
+          points[1] = points[1]*1 + lastY;
+        }
+        points[0] = lastX;
+        type = 'L';
+      }
+
       tem = {
-        type: order2func[v.match(regodr)[0]],
-        points: v.replace(regodr,'').split(',')
+        type: order2func[type],
+        points: points
       };
       arr.push(tem)
     });
