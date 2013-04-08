@@ -264,12 +264,7 @@ function rgb2hex(r, g, b) {
     }
     return v;
   }
-}
-
-
-
-
-var Version = 0.01,
+}var Version = 0.01,
   /*!
     @Name: SI
     @Info: Sivona.js的命名空间，以及新画布的构造函数
@@ -292,10 +287,9 @@ var Version = 0.01,
 
 
 
-var EvArray,
+var EvArray = new Class,
   domEvents = ['click', 'mouseover', 'mouseout', 'mousemove', 'mousedown', 'mouseup', 'drag'];
 
-EvArray = new Class;
 EvArray.include({
   init: function(paper, event){
     this.els = [];
@@ -330,7 +324,7 @@ EvArray.include({
           el.translate(nowPos.x - oldPos.x, nowPos.y - oldPos.y);
           el.oldPos = nowPos;
         }
-        v.handle.call(v.target, e);
+        if(v.handle) v.handle.call(v.target, e);
       }
     });
   }
@@ -617,6 +611,7 @@ Paper.include({
       Todo: clip
       Todo: pattern
       Todo: group 将多个图形设置成组
+      Todo: drag方法不触发click
    */
   initEveHandler: function(){
     var self = this,
@@ -862,6 +857,8 @@ Paper.include({
 
    pathString = "Mx,yLx,y..."
 
+   Todo: 小写 相对位置
+
    pathJSON = [
     {type:'moveTo', points: [x, y]},
     {type:'lineTo', points: [x, y]},
@@ -1052,7 +1049,6 @@ Matrix.include({
 });
 
 /*!
-    TODO: 同类元素的集合，通过集合改变属性、增删事件
     Todo: text绘制方法
     @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
  */
@@ -1144,7 +1140,6 @@ Celement.include({
   animate: function(/* obj, num, func */){
     return sanimator.add(this, arguments);
   },
-  //Todo: remove el remove event remove animate
   remove: function(){
     var self = this;
     self.hide();
