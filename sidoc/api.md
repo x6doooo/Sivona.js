@@ -228,8 +228,6 @@ paper.rect(...);
 
 pathString = "Mx,yLx,y..."
 
-Todo: 小写 相对位置
-
 pathJSON = [
 
 {type:'moveTo', points: [x, y]},
@@ -256,8 +254,6 @@ paper.path(pathJSON);
 
 ===
 ===
-
-Todo: text绘制方法
 
 @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
 
