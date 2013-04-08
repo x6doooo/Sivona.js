@@ -228,6 +228,8 @@ paper.rect(...);
 
 pathString = "Mx,yLx,y..."
 
+Todo: 小写 相对位置
+
 pathJSON = [
 
 {type:'moveTo', points: [x, y]},
@@ -254,8 +256,6 @@ paper.path(pathJSON);
 
 ===
 ===
-
-TODO: 同类元素的集合，通过集合改变属性、增删事件
 
 Todo: text绘制方法
 
