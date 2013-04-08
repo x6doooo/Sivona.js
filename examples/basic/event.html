@@ -9,12 +9,17 @@
 	<div id="box"></div>
 	<script>
 
+		cfg = {lineWidth:0, fillStyle:'#333'};
 		paper = SI('box', 700, 700);
-		rect = paper.rect(10, 10, 320, 240);
-		rect.click(function(){
+
+		r = paper.rect(10, 10, 100, 70).attr(cfg);
+		r.click(function(){
 			alert(1);
 		});
-		rect.drag();
+
+		c = paper.circle(50, 100, 30).attr(cfg);
+		c.drag();
+
 
 	</script>
 </body>
