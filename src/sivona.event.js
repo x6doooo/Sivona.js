@@ -35,7 +35,7 @@ EvArray.include({
           el.translate(nowPos.x - oldPos.x, nowPos.y - oldPos.y);
           el.oldPos = nowPos;
         }
-        v.handle.call(v.target, e);
+        if(v.handle) v.handle.call(v.target, e);
       }
     });
   }
