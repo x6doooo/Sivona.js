@@ -39,7 +39,7 @@
       window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
   }
 
-  if (!SI.requestAnimationFrame)
+  if (!SI.requestAnimationFrame){
     SI.requestAnimationFrame = function(callback, element) {
       currTime = new Date().getTime();
       timeToCall = Math.max(0, 16 - (currTime - lastTime));
@@ -48,11 +48,13 @@
       lastTime = currTime + timeToCall;
       return id;
     };
+  }
 
-  if (!SI.cancelAnimationFrame)
+  if (!SI.cancelAnimationFrame){
     SI.cancelAnimationFrame = function(id) {
       clearTimeout(id);
     };
+  }
 }());
 
 
@@ -123,15 +125,14 @@ Animator.include({
     return _id;
   },
   remove: function(_id){
-    var self = this,
-      amtArr = self.amtArr;
-    amtArr.forEach(function(v, i, a){
-      if(v[5] == _id) a.splice(i, 1);
-    });
+    var amtArr = this.amtArr,
+      len = amtArr.length;
+    while(len--){
+      if(amtArr[5] == _id) amtArr.splice(i, 1);
+    }
   },
   abort: function(){
-    var self = this;
-    self.init();
+    this.init();
   },
   action: function(){
     var self = this,
@@ -146,9 +147,15 @@ Animator.include({
       tar,
       tem,
       pt,
-      done;
+      done,
+      len,
+      i,
+      v;
     self.stamp = +new Date();
-    amtArr.forEach(function(v, i){
+
+    len = amtArr.length;
+    while(len--){
+      v = amtArr[len];
       el = v[0];
       am = v[1];
       hl = v[2];
@@ -167,28 +174,32 @@ Animator.include({
           }else{
             el[k].apply(el, src);
           }
-          src.forEach(function(o, n, aa){
-            aa[n] += (st[n] * td);
-          });
+          i = src.length;
+          while(i--){
+            src[i] += (st[i] * td);
+          }
         }else if(k.search(/fillStyle|strokeStyle|shadowColor/) != -1){
           tem = {};
           tem[k] = rgb2hex.apply(this, src);
           el.attr(tem);
-          src.forEach(function(o, n, aa){
-            aa[n] += (st[n] * td);
-          });
+          i = src.length;
+          while(i--){
+            src[i] += (st[i] * td);
+          }
         }else{
           tem = {};
           tem[k] = src;
           el.attr(tem);
           val.src += (st * td);
         }
+        el.paper.render();
       });
       if(done){
-        amtArr.splice(i, 1);
+        amtArr.splice(len, 1);
         cb();
       }
-    });
+    }
+
     SI.cancelAnimationFrame(self.timer);
     self.timer = SI.requestAnimationFrame(function(){
       self.timeDiff = (+new Date() - self.stamp);
