@@ -5,6 +5,7 @@
  */
 var Paper,
   Matrix,
+  Cgroup,
   Celement,
   Crect,
   Carc,
@@ -23,7 +24,7 @@ var Paper,
 
 Paper = new Class;
 Paper.include({
-  init: function(container_id, w, h){
+  init: function(container_id, w, h, t, l){
     var self = this,
       ct,
       cn;
@@ -31,10 +32,8 @@ Paper.include({
       throw new Error('container is not defined!');
     }
     if(isUndefined(w)){
-      w = window.screen.width;
-    }
-    if(isUndefined(h)){
-      h = window.screen.height;
+      w = window.innerWidth;
+      h = window.innerHeight;
     }
     ct = document.getElementById(container_id);
     if(ct === null){
@@ -44,6 +43,11 @@ Paper.include({
     cn.style.position = 'absolute';
     self.width = cn.width = w;
     self.height = cn.height = h;
+
+    if(isDefined(t)){
+      cn.style.top = t + 'px';
+      cn.style.left = l + 'px';
+    }
     cn.id = container_id + '_canvas';
     ct.appendChild(cn);
     self.container = ct;
@@ -56,7 +60,8 @@ Paper.include({
   /*
       初始化事件处理对象
       Todo: 事件冒泡
-      Todo: 泛光效果
+      Todo: 泛光(shadow)
+      Todo: 渐变
       Todo: image
       Todo: clip
       Todo: pattern
@@ -66,43 +71,49 @@ Paper.include({
   initEveHandler: function(){
     var self = this,
       node = self.canvasNode,
-      events = domEvents;
+      events = domEvents,
+      len = events.length,
+      event;
+
     self.eves = {};
     self.hasIn = [];
     self.isDrag = false;
-    events.forEach(function(event){
+
+    while(len--){
+      event = events[len];
       self.eves[event] = new EvArray(self, event);
       node.addEventListener(event, function(e){
         var type = e.type,
           p, who, tem,
-          pos_now, pos_old,
           tem_over = [],
           tem_out = [],
-          tem_move = [];
+          tem_move = [],
+          isDrag = self.isDrag,
+          hasIn = self.hasIn,
+          eves = self.eves;
         if(type == 'mouseover' || type == 'mouseout') return;
         p = getEventPosition(e);
         who = self.whoHasThisPoint(p);
         if(type.search(/click|mousedown|mouseup|dbclick/) != -1){
           if(who.length == 0) return;
           if(type == 'mousedown'){
-            self.isDrag = who[who.length - 1];
-            self.isDrag.oldPos = getEventPosition(e);
+            isDrag = who[who.length - 1];
+            isDrag.oldPos = getEventPosition(e);
           }
-          if(type == 'mouseup') self.isDrag = false;
-          self.eves[type].handle(who, e);
-        }else if(type == 'mousemove' && self.isDrag){
+          if(type == 'mouseup') isDrag = false;
+          eves[type].handle(who, e);
+        }else if(type == 'mousemove' && isDrag){
           //drag
-          self.eves['drag'].handle([self.isDrag], e);
+          eves['drag'].handle([isDrag], e);
         }else if(type == 'mousemove'){
-          if(who.length != 0 && self.hasIn.length == 0){
+          if(who.length != 0 && hasIn.length == 0){
             //over
             who.forEach(function(v){
               v.setIncome(true);
             });
-            self.eves['mouseover'].handle(who, e);
+            eves['mouseover'].handle(who, e);
           }else if(who.length != 0){
             //over move out
-            tem = [];
             who.forEach(function(v){
               if(v.income){
                 //move
@@ -113,28 +124,30 @@ Paper.include({
                 tem_over.push(v);
               }
             });
-            self.hasIn.forEach(function(v){
+            hasIn.forEach(function(v){
               if(who.indexOf(v) < 0 ){
                 v.income = false;
                 tem_out.push(v);
               }
             });
-            if(tem_over.length >= 0) self.eves['mouseover'].handle(tem_over, e);
-            if(tem_move.length >= 0) self.eves['mousemove'].handle(tem_move, e);
-            if(tem_out.length >= 0) self.eves['mouseout'].handle(tem_out, e);
-            self.hasIn = who;
-          }else if(self.hasIn.length != 0){
+            if(tem_over.length >= 0) eves['mouseover'].handle(tem_over, e);
+            if(tem_move.length >= 0) eves['mousemove'].handle(tem_move, e);
+            if(tem_out.length >= 0) eves['mouseout'].handle(tem_out, e);
+            hasIn = who;
+          }else if(hasIn.length != 0){
             //out
-            self.hasIn.forEach(function(v){
+            hasIn.forEach(function(v){
               v.income = false;
             });
-            who = self.hasIn;
-            self.eves['mouseout'].handle(who, e);
-            self.hasIn = [];
+            who = hasIn;
+            eves['mouseout'].handle(who, e);
+            hasIn = [];
           }
         }
+        self.isDrag = isDrag;
+        self.hasIn = hasIn;
       }, false);
-    });
+    }
   },
   /*!Private
       @Name: paper.reset
@@ -168,32 +181,43 @@ Paper.include({
   initShape: function(el){
     var self = this,
       els = self.allElements,
-      eves = self.eves;
+      eves = self.eves,
+      len = domEvents.length,
+      event;
+
     el.paper = self;
     el.context = self.canvasContext;
     el.zIndex = els.length;
     /*
         绑定事件
      */
-    domEvents.forEach(function(event){
-      el[event] = function(func){
-        eves[event].push({
-          target: el,
-          type: event,
-          handle: func
-        });
-      };
-      el['un'+event] = function(func){
-        if(func){
-          eves[event].delete(el, func);
-        }else{
-          eves[event].delete(el);
-        }
-      };
-    });
+    while(len--){
+      event = domEvents[len];
+      (function(event){
+        el[event] = function(func){
+          eves[event].push({
+            target: el,
+            type: event,
+            handle: func
+          });
+        };
+        el['un'+event] = function(func){
+          if(func){
+            eves[event].delete(el, func);
+          }else{
+            eves[event].delete(el);
+          }
+        };
+      })(event);
+    }
     els.push(el);
-    self.refresh();
+    self.render();
     return el;
+  },
+  group: function(){
+    var arr = to_a(arguments),
+      g = new Cgroup(arr);
+    return g;
   },
   text: function(t, x, y, w){
     var self = this,
@@ -370,24 +394,24 @@ Paper.include({
   render: function(check){
     var self = this,
       allElements = self.allElements,
+      len = allElements.length,
       ctx = self.canvasContext,
-      which = [];
+      which = [],
+      el;
     self.clear();
     allElements.sort(function(a, b){
-      return a.zIndex - b.zIndex;
+      return b.zIndex - a.zIndex;
     });
-    allElements.forEach(function(el, idx, all){
-      if(el.display == false) return;
-      el.render();
-      if(check && ctx.isPointInPath(check.x, check.y)){
-        which.push(el);
+    while(len--){
+      el = allElements[len];
+      if(el.display !== false){
+        el.render();
+        if(check && ctx.isPointInPath(check.x, check.y)){
+          which.push(el);
+        }
       }
-    });
+    }
     return which;
-  },
-  refresh: function(){
-    this.clear();
-    this.render();
   },
   /*!Private
 
@@ -467,12 +491,12 @@ Matrix.include({
   },
   translate: function(x, y){
     this.update(1, 0, 0, 1, x, y);
-    this.paper.refresh();
+    this.paper.render();
     return this;
   },
   transform: function(a, b, c, d, e, f){
     this.update(a, b, c, d, e, f);
-    this.paper.refresh();
+    this.paper.render();
     return this;
   },
   scale: function(sx, sy, x, y){
@@ -480,7 +504,7 @@ Matrix.include({
     (x || y) && this.update(1, 0, 0, 1, x, y);
     this.update(sx, 0, 0, sy, 0, 0);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
-    this.paper.refresh();
+    this.paper.render();
     return this;
   },
   rotate: function(a, x, y){
@@ -491,9 +515,27 @@ Matrix.include({
       cosa = toFixed(cos(a), 9);
     this.update(cosa, sina, -sina, cosa, x, y);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
-    this.paper.refresh();
+    this.paper.render();
     return this;
   }
+});
+
+Cgroup = new Class;
+Cgroup.include({
+  init: function(arr){
+    this.els = arr;
+    return this;
+  },
+  push: function(a){
+    this.els.push(a);
+  },
+  attr: function(cfg){
+    var els = this.els;
+    els.forEach(function(v){
+      v.attr(cfg);
+    });
+  },
+  show: function(){}
 });
 
 /*!
@@ -533,15 +575,31 @@ Celement.include({
     }
     return self.data[k];
   },
-  attr: function(cfg){
-    var self = this;
-    extend(true, self.cfg, cfg);
-    self.paper.refresh();
+  attr: function(){
+    var self = this,
+      args = to_a(arguments),
+      l = args.length,
+      a0;
+    if(l == 0){
+      return self;
+    }
+    a0 = args[0];
+    if(isString(a0) && l == 1){
+      return self.cfg[a0];
+    }
+    if(l == 2){
+      self.cfg[a0] = args[1];
+    }else if(isObject(a0)){
+      extend(true, self.cfg, a0);
+    }else{
+      return self;
+    }
+    self.paper.render();
     return self;
   },
   show: function(){
     this.display = true;
-    this.paper.refresh();
+    this.paper.render();
   },
   hide: function(){
     var self = this,
@@ -553,7 +611,7 @@ Celement.include({
     if(idx >= 0){
       hasIn.splice(idx, 1);
     }
-    paper.refresh();
+    paper.render();
   },
   close: function(){
     this.closeit = true;
@@ -599,6 +657,7 @@ Celement.include({
     domEvents.forEach(function(event){
       self['un'+event]();
     });
+    self.paper.render();
   }
 });
 
@@ -665,31 +724,31 @@ Cpath.extend({
     str = str.split('|');
     var arr = [],
       tem = {},
-      ps = [],
       type,
       points,
       last_points,
       len,
       lastX,
-      lastY;
-    str.forEach(function(v, i, a){
-      if(v == '') return;
+      lastY,
+      i = 0,
+      l = str.length,
+      v;
+
+    for(;i < l; i++){
+      v = str[i];
+      if(v == '') continue;
       type = v.match(regodr)[0];
-
-      if(type == 'z'){
+      if(type == 'z' || type == 'Z'){
         type = type.toUpperCase();
-        return;
+        continue;
       }
-
       points = v.replace(regodr, '').replace(/\b\-/g, ',-').split(',');
-
       if(arr.length !== 0){
         last_points = arr[arr.length-1].points;
         len = last_points.length;
         lastX = last_points[len-2]*1;
         lastY = last_points[len-1]*1;
       }
-
       if(type.search(regodr_lower) !== -1){
         points[0] = points[0]*1 + lastX;
         points[1] = points[1]*1 + lastY;
@@ -703,7 +762,6 @@ Cpath.extend({
         }
         type = type.toUpperCase();
       }
-
       if(type == 'H' || type == 'h'){
         points[1] = lastY;
         if(type == 'h'){
@@ -711,7 +769,6 @@ Cpath.extend({
         }
         type = 'L';
       }
-
       if(type == 'V' || type == 'v'){
         points[1] = points[0];
         if(type == 'v'){
@@ -720,13 +777,12 @@ Cpath.extend({
         points[0] = lastX;
         type = 'L';
       }
-
       tem = {
         type: order2func[type],
         points: points
       };
       arr.push(tem)
-    });
+    }
     return arr;
   }
 });
@@ -735,8 +791,13 @@ Cpath.include({
     var self = this,
       ctx = self.context,
       cfg = self.cfg,
-      json = self.pathJSON;
-    json.forEach(function(step, idx, all){
+      json = self.pathJSON,
+      len = json.length,
+      i = 0,
+      step;
+
+    for(;i<len;i++){
+      step = json[i];
       ctx[step.type].apply(ctx, step.points)
       if(step.type == 'closePath'){
         if(cfg.lineWidth != 0){
@@ -746,7 +807,7 @@ Cpath.include({
           ctx.fill();
         }
       }
-    });
+    }
     self.closeit = false;
   }
 });
