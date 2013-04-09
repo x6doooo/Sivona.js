@@ -1,6 +1,6 @@
 ===
 
-#@Title: Sivona v0.01
+#@Title: Sivona v0.0.1
 
 ##@Link: https://github.com/x6doooo/Sivona.js
 
@@ -103,6 +103,10 @@ tom = new Son;  //创建实例
 - w {number} 画布宽度（可选 默认为浏览器窗口宽度）
 
 - h {number} 画布高度（可选 默认为浏览器窗口高度）
+
+- t {number} 画布位置top值
+
+- l {number} 画布位置left值
 
 @Return:
 
