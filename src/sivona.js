@@ -1,6 +1,6 @@
 /*!
 
-  @Title: Sivona v0.0.1
+  @Title: Sivona v0.0.2
   @Link: https://github.com/x6doooo/Sivona.js
   @Copyright: Copyright 2013 Dx. Yang
   @License: Released under the MIT license
@@ -264,7 +264,7 @@ function rgb2hex(r, g, b) {
     }
     return v;
   }
-}var Version = "0.0.1",
+}var Version = "0.0.2",
   /*!
     @Name: SI
     @Info: Sivona.js的命名空间，以及新画布的构造函数
@@ -291,6 +291,8 @@ function rgb2hex(r, g, b) {
 
 var EvArray = new Class,
   domEvents = ['click', 'mouseover', 'mouseout', 'mousemove', 'mousedown', 'mouseup', 'drag'];
+
+SI.onEvent = true;
 
 EvArray.include({
   init: function(paper, event){
@@ -541,7 +543,7 @@ Animator.include({
       });
       if(done){
         amtArr.splice(len, 1);
-        cb();
+        cb.call(el);
       }
     }
 
@@ -618,7 +620,8 @@ Paper.include({
     self.canvasNode = cn;
     self.canvasContext = cn.getContext('2d');
     self.allElements = [];
-    self.initEveHandler();
+    self.onRender = true;
+    if(SI.onEvent) self.initEveHandler();
     self.reset();
   },
   /*
@@ -1055,12 +1058,12 @@ Matrix.include({
   },
   translate: function(x, y){
     this.update(1, 0, 0, 1, x, y);
-    this.paper.render();
+    if(this.paper.onRender) this.paper.render();
     return this;
   },
   transform: function(a, b, c, d, e, f){
     this.update(a, b, c, d, e, f);
-    this.paper.render();
+    if(this.paper.onRender) this.paper.render();
     return this;
   },
   scale: function(sx, sy, x, y){
@@ -1068,7 +1071,7 @@ Matrix.include({
     (x || y) && this.update(1, 0, 0, 1, x, y);
     this.update(sx, 0, 0, sy, 0, 0);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
-    this.paper.render();
+    if(this.paper.onRender) this.paper.render();
     return this;
   },
   rotate: function(a, x, y){
@@ -1079,7 +1082,7 @@ Matrix.include({
       cosa = toFixed(cos(a), 9);
     this.update(cosa, sina, -sina, cosa, x, y);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
-    this.paper.render();
+    if(this.paper.onRender) this.paper.render();
     return this;
   }
 });
@@ -1163,7 +1166,7 @@ Celement.include({
   },
   show: function(){
     this.display = true;
-    this.paper.render();
+    if(this.paper.onRender) this.paper.render();
   },
   hide: function(){
     var self = this,
@@ -1175,7 +1178,7 @@ Celement.include({
     if(idx >= 0){
       hasIn.splice(idx, 1);
     }
-    paper.render();
+    if(paper.onRender) paper.render();
   },
   close: function(){
     this.closeit = true;
@@ -1221,7 +1224,7 @@ Celement.include({
     domEvents.forEach(function(event){
       self['un'+event]();
     });
-    self.paper.render();
+    if(self.paper.onRender) self.paper.render();
   }
 });
 
@@ -1378,6 +1381,8 @@ Cpath.include({
 SI.Paper = Paper;
 SI.version = Version;
 SI.animationController = sanimator;
+SI.getEventPosition = getEventPosition;
+SI.parsePath = Cpath.parse;
 window.SIVONA = window.SI = SI;
 
 }(window));
