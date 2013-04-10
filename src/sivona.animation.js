@@ -196,7 +196,7 @@ Animator.include({
       });
       if(done){
         amtArr.splice(len, 1);
-        cb();
+        cb.call(el);
       }
     }
 
