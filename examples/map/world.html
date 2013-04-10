@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title> Sivona.js Examples </title>
+	<script src="../../src/sivona.js"></script>
+	<script src="world.js"></script>
+</head>
+<body id="container" style="margin:0;padding:0;background:#000;">
+
+<script>
+
+	var ps = [],
+		pp = [],
+		draw,
+		addPoints,
+		paper,
+		ctx,
+		max,
+		len,
+		pl,
+		v,
+		p,
+		i;
+
+	window.onload = function(){
+
+
+		SI.onEvent = false;
+		paper = SI('container');
+
+		ctx = paper.canvasContext;
+
+		loadingTxt = paper.text('loading', paper.width/2, paper.height/2).attr({
+			lineWidth: 0,
+			fillStyle: '#333'
+		});
+
+		world_json_data.forEach(function(v){
+
+			ps.push(SI.parsePath(v));
+
+		});
+
+		ps.sort(function(a, b){
+			return b.length - a.length;
+		});
+
+		max = ps[0].length;
+
+		len = ps.length;
+		i = 0;
+		while(i < len){
+			pp[i] = [];
+			i++
+		}
+
+		draw = function(k){
+			paper.clear();
+			ctx.save();
+			ctx.strokeStyle = '#fff';
+			ctx.lineWidth = 0.2;
+			ctx.scale(3, 3);
+			ctx.beginPath()
+			len = pp.length;
+			while(len--){
+
+				v = pp[len];
+
+				i = 0;
+				pl = v.length;
+				for(; i < pl; i++){
+					p = v[i];
+					ctx[p.type].apply(ctx, p.points);
+				}
+
+			}
+			ctx.stroke();
+			ctx.restore();
+		};
+
+		addPoints = function(){
+			var k = 10;
+			while(k--){
+				len = ps.length;
+				for(;len--;){
+					if(ps[len].length === 0){
+						ps.splice(len, 1);
+						continue;
+					}
+					pp[len].push(ps[len].shift());
+				}
+			}
+
+			len = pp.length;
+
+			draw();
+
+			if(ps.length !== 0){
+				setTimeout(function(){
+					addPoints();
+				},0);
+			}else{
+				draw(true);
+			}
+
+		};
+		addPoints();
+
+	};
+
+
+</script>
+
+</body>
+</html>
+</body>
+</html>
