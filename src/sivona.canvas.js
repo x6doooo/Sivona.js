@@ -54,7 +54,8 @@ Paper.include({
     self.canvasNode = cn;
     self.canvasContext = cn.getContext('2d');
     self.allElements = [];
-    self.initEveHandler();
+    self.onRender = true;
+    if(SI.onEvent) self.initEveHandler();
     self.reset();
   },
   /*
@@ -491,12 +492,12 @@ Matrix.include({
   },
   translate: function(x, y){
     this.update(1, 0, 0, 1, x, y);
-    this.paper.render();
+    if(this.paper.onRender) this.paper.render();
     return this;
   },
   transform: function(a, b, c, d, e, f){
     this.update(a, b, c, d, e, f);
-    this.paper.render();
+    if(this.paper.onRender) this.paper.render();
     return this;
   },
   scale: function(sx, sy, x, y){
@@ -504,7 +505,7 @@ Matrix.include({
     (x || y) && this.update(1, 0, 0, 1, x, y);
     this.update(sx, 0, 0, sy, 0, 0);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
-    this.paper.render();
+    if(this.paper.onRender) this.paper.render();
     return this;
   },
   rotate: function(a, x, y){
@@ -515,7 +516,7 @@ Matrix.include({
       cosa = toFixed(cos(a), 9);
     this.update(cosa, sina, -sina, cosa, x, y);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
-    this.paper.render();
+    if(this.paper.onRender) this.paper.render();
     return this;
   }
 });
@@ -599,7 +600,7 @@ Celement.include({
   },
   show: function(){
     this.display = true;
-    this.paper.render();
+    if(this.paper.onRender) this.paper.render();
   },
   hide: function(){
     var self = this,
@@ -611,7 +612,7 @@ Celement.include({
     if(idx >= 0){
       hasIn.splice(idx, 1);
     }
-    paper.render();
+    if(paper.onRender) paper.render();
   },
   close: function(){
     this.closeit = true;
@@ -657,7 +658,7 @@ Celement.include({
     domEvents.forEach(function(event){
       self['un'+event]();
     });
-    self.paper.render();
+    if(self.paper.onRender) self.paper.render();
   }
 });
 
