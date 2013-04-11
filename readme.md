@@ -36,11 +36,10 @@ paper.rect(10, 10, 20, 20);
 
 ###SVG转Canvas
 
-由于eps、ai等矢量图形文件可以转成SVG，所以相对而言，SVG可用的图形资源更多。Sivona.js可以对SVG路径进行解析，转换为Canvas绘制。
+由于eps、ai等矢量图形文件可以转成SVG，所以相对而言，SVG可用的图形资源更多。Sivona.js可以对SVG路径进行解析，转换为Canvas绘制, 以便让Canvas也能够使用更多的图形资源。
 
 ```js
 paepr = SI('div1');
-
 //直接使用描述路径的字符串进行绘制
 path = paper.path('M10,10 L100,100 V200 H200')
 ```
@@ -54,13 +53,11 @@ strArr = [
   'M10,10 L100,100 V200 H200',
   'M10,20 L-100-100 V-200 H-200',
   ...
-]
-
+];
 strArr.forEach(function(v, i, a){
   //SI.parsePath就是解析方法，它会将解析结果返回出来，等到需要的时候再进行绘制
   a[i] = SI.parsePath(v);
 });
-
 ```
 
 
