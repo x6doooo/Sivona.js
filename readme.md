@@ -27,6 +27,7 @@ Sivona.js是一个HTML5 Canvas 2D绘制类库，主要包括形状绘制、事�
 
 @Usage:
 
-	var paper  = SI('div1', 100, 100);
-	paper.rect(10, 10, 20, 20);
-
+```js
+var paper  = SI('div1', 100, 100);
+paper.rect(10, 10, 20, 20);
+```
