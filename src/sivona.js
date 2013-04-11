@@ -634,6 +634,7 @@ Paper.include({
       Todo: pattern
       Todo: group 将多个图形设置成组
       Todo: drag方法不触发click
+      Todo: 解除绑定 & 全部解除
    */
   initEveHandler: function(){
     var self = this,

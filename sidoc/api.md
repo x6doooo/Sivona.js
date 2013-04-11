@@ -1,14 +1,14 @@
 ===
 
-#@Title: Sivona v0.0.2
+#Sivona.js v0.0.2
 
-##@Link: https://github.com/x6doooo/Sivona.js
+@Link: <https://github.com/x6doooo/Sivona.js>
 
 @Copyright: Copyright 2013 Dx. Yang
 
 @License: Released under the MIT license
 
-===
+
 ===
 
 @Name: Class
@@ -87,7 +87,7 @@ this._super();  //调用父类的同名方法 和其他语言的super功能相�
 
 tom = new Son;  //创建实例
 
-===
+
 ===
 
 @Name: SI
@@ -118,7 +118,7 @@ var paper = SI('div1', 100, 200);
 
 paper.rect(...);
 
-===
+
 ===
 
 @Name: Paper
@@ -127,7 +127,7 @@ paper.rect(...);
 
 @Info: 画布类，实例拥有各种绘图方法 一般通过SI方法new出实例
 
-===
+
 ===
 
 @Name: paper.rect(x, y, w, h)
@@ -148,7 +148,7 @@ paper.rect(...);
 
 - 实例对象
 
-===
+
 ===
 
 @Name: paper.arc(x, y, r, sAngle, eAngle, counterclockwise)
@@ -173,7 +173,7 @@ paper.rect(...);
 
 - 实例对象
 
-===
+
 ===
 
 @Name: paper.circle(x, y, r)
@@ -192,7 +192,7 @@ paper.rect(...);
 
 - 实例对象
 
-===
+
 ===
 
 @Name: paper.ellipse(x, y, xr, yr)
@@ -213,7 +213,7 @@ paper.rect(...);
 
 - 实例对象
 
-===
+
 ===
 
 @Name: path
@@ -256,9 +256,9 @@ paper.path(pathString);
 
 paper.path(pathJSON);
 
-===
+
 ===
 
 @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
 
-===
+

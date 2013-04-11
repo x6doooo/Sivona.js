@@ -54,9 +54,9 @@ files = files.map do |line|
   line = line.gsub(/^\s+|^\t+/, "")
   line = line.gsub(/\n/, "\n\n")
   line = line.gsub(/\/\*\!/, "===")
-  line = line.gsub(/\*\//, "===\n")
-  line = line.gsub(/@Title/, "\#@Title")
-  line = line.gsub(/@Link/, "\#\#@Link")
+  line = line.gsub(/\*\//, "\n")
+  line = line.gsub(/@Title:\s*/, "\#")
+  line = line.gsub(/(@Link\:\s*)(.+$)/, '\\1<\\2>')
 end
 
 puts files.inspect
