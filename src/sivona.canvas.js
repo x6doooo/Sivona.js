@@ -54,6 +54,7 @@ Paper.include({
     self.canvasNode = cn;
     self.canvasContext = cn.getContext('2d');
     self.allElements = [];
+    //Todo: onRender 是控制画布是否即时更新变化，目前这个设置并不理想，需要找个更好的解决方案
     self.onRender = true;
     if(SI.onEvent) self.initEveHandler();
     self.reset();
@@ -217,8 +218,11 @@ Paper.include({
     return el;
   },
   group: function(){
-    var arr = to_a(arguments),
+    var self = this,
+      arr = to_a(arguments),
       g = new Cgroup(arr);
+    g.paper = self;
+    g.content = self.canvasContext;
     return g;
   },
   text: function(t, x, y, w){
@@ -377,7 +381,7 @@ Paper.include({
         break;
       case 'path':
         tem = new Cpath(cf);
-        break
+        break;
       default: break;
     }
     tem.attr(cf.cfg);
@@ -385,7 +389,7 @@ Paper.include({
     tem.zIndex = cf.zIndex;
     return tem;
   },
-  /*Private
+  /*!Private
 
       清空画布 重绘一帧
       whoHasThisPoint方法也通过render实现
@@ -522,6 +526,8 @@ Matrix.include({
   }
 });
 
+//Todo: group在循环组内元素时，每改动一个元素都会触发一次重绘，需要结合重绘调用的配置进行优化
+//Todo: 给一组元素设置事件，触发时是触发单个，还是整体触发？比如拖动，拖一个时，其他动不动？
 Cgroup = new Class;
 Cgroup.include({
   init: function(arr){
@@ -537,7 +543,20 @@ Cgroup.include({
       v.attr(cfg);
     });
   },
-  show: function(){}
+  show: function(){
+    var els = this.els,
+      l = els.length;
+    while(l--){
+      els[l].show();
+    }
+  },
+  hide: function(){
+    var els = this.els,
+      l = els.length;
+    while(l--){
+      els[l].hide();
+    }
+  }
 });
 
 /*!
