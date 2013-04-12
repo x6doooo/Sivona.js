@@ -531,31 +531,26 @@ Matrix.include({
 Cgroup = new Class;
 Cgroup.include({
   init: function(arr){
-    this.els = arr;
+    var self = this;
+      self.els = arr,
+      methods = ['show', 'hide', 'attr'];
+
+    methods.forEach(function(v){
+      self[v] = function(){
+        var els = self.els,
+          l = els.length,
+          el;
+
+        while(l--){
+          el = els[l];
+          el[v].apply(el, arguments);
+        }
+      };
+    });
     return this;
   },
   push: function(a){
     this.els.push(a);
-  },
-  attr: function(cfg){
-    var els = this.els;
-    els.forEach(function(v){
-      v.attr(cfg);
-    });
-  },
-  show: function(){
-    var els = this.els,
-      l = els.length;
-    while(l--){
-      els[l].show();
-    }
-  },
-  hide: function(){
-    var els = this.els,
-      l = els.length;
-    while(l--){
-      els[l].hide();
-    }
   }
 });
 
