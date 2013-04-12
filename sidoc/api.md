@@ -1,6 +1,6 @@
 ===
 
-#Sivona.js v0.0.2
+#Sivona v0.0.3
 
 @Link: <https://github.com/x6doooo/Sivona.js>
 
@@ -260,5 +260,26 @@ paper.path(pathJSON);
 ===
 
 @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
+
+
+===
+
+@Name: SI.parsePath(d)
+
+@Info: 解析SVG路径描述，转为Canvas绘制用的命令和点的数组
+
+@Params:
+
+- d {string} svg路径字符串
+
+@Return:
+
+- {array}
+
+@Usage:
+
+arr = SI.parsePath('M10,10L10,10C-10-10...');
+
+//arr = [{type:'moveTo',points:[10,10]}, {type:'lineTo',points:[10,10]}...]
 
 
