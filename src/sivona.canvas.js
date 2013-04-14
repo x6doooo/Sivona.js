@@ -534,7 +534,6 @@ Cgroup.include({
     var self = this;
       self.els = arr,
       methods = ['show', 'hide', 'attr'];
-
     methods.forEach(function(v){
       self[v] = function(){
         var els = self.els,
