@@ -131,6 +131,15 @@ Animator.include({
       if(amtArr[5] == _id) amtArr.splice(i, 1);
     }
   },
+  pause: function(){
+    this.pauseArr = amtArr;
+    this.amtArr = [];
+  },
+  process: function(){
+    this.amtArr = this.pauseArr;
+    this.pauseArr = [];
+    this.action();
+  },
   abort: function(){
     this.init();
   },
