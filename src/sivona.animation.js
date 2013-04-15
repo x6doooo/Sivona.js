@@ -1,4 +1,4 @@
-/*
+/*!Private
  TODO:？？？ path  转换path描述？？？
  Todo: 多个canvas同时执行动画 test
  Todo: 中断某个元素的动画
@@ -114,7 +114,7 @@ Animator.include({
         };
       }
     });
-    amtArr.push([el, am, hl, cb, +new Date(), _id]);
+    amtArr.push([el, am, hl, cb, Date.now(), _id]);
     if(oldStatus == 0){ //不为0则有action在执行
       self.action();
     }
@@ -129,12 +129,12 @@ Animator.include({
   },
   pause: function(){
     this.pauseArr = this.amtArr;
-    this.pauseStamp = +new Date();
+    this.pauseStamp = Date.now();
     this.amtArr = [];
   },
   process: function(){
     var amtAttr = this.pauseArr,
-      pauseTime = new Date() - this.pauseStamp,
+      pauseTime = Date.now() - this.pauseStamp,
       len = amtAttr.length;
     while(len--){
       amtAttr[len][4] += pauseTime;
@@ -164,7 +164,7 @@ Animator.include({
       len,
       i,
       v;
-    self.stamp = +new Date();
+    self.stamp = Date.now();
 
     len = amtArr.length;
     while(len--){
@@ -192,19 +192,28 @@ Animator.include({
             src[i] += (st[i] * td);
           }
         }else if(k.search(/fillStyle|strokeStyle|shadowColor/) != -1){
-          //Todo: if(done) ....
           tem = {};
-          tem[k] = rgb2hex.apply(this, src);
-          el.attr(tem);
-          i = src.length;
-          while(i--){
-            src[i] += (st[i] * td);
+          if(done){
+            tem[k] = rgb2hex.apply(this, tar);
+            el.attr(tem);
+          }else{
+            tem[k] = rgb2hex.apply(this, src);
+            el.attr(tem);
+            i = src.length;
+            while(i--){
+              src[i] += (st[i] * td);
+            }
           }
         }else{
           tem = {};
-          tem[k] = src;
-          el.attr(tem);
-          val.src += (st * td);
+          if(done){
+            tem[k] = tar;
+            el.attr(tem);
+          }else{
+            tem[k] = src;
+            el.attr(tem);
+            val.src += (st * td);
+          }
         }
         el.paper.render();
       });
@@ -216,7 +225,7 @@ Animator.include({
 
     SI.cancelAnimationFrame(self.timer);
     self.timer = SI.requestAnimationFrame(function(){
-      self.timeDiff = (+new Date() - self.stamp);
+      self.timeDiff = Date.now() - self.stamp;
       self.checkStatus();
     });
   },
