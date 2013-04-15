@@ -1,10 +1,7 @@
 /*
- matrix、attributes
  TODO:？？？ path  转换path描述？？？
  Todo: 多个canvas同时执行动画 test
- Todo: 中断动画 test
  Todo: 中断某个元素的动画
- Todo: 暂停和继续
 
     animator = new Animator();
 
@@ -56,7 +53,6 @@
     };
   }
 }());
-
 
 var Animator = new Class;
 Animator.include({
@@ -132,13 +128,21 @@ Animator.include({
     }
   },
   pause: function(){
-    this.pauseArr = amtArr;
+    this.pauseArr = this.amtArr;
+    this.pauseStamp = +new Date();
     this.amtArr = [];
   },
   process: function(){
-    this.amtArr = this.pauseArr;
+    var amtAttr = this.pauseArr,
+      pauseTime = new Date() - this.pauseStamp,
+      len = amtAttr.length;
+    while(len--){
+      amtAttr[len][4] += pauseTime;
+    }
+    this.amtArr = amtAttr;
     this.pauseArr = [];
-    this.action();
+    this.timeDiff = 1;
+    this.checkStatus();
   },
   abort: function(){
     this.init();
@@ -188,6 +192,7 @@ Animator.include({
             src[i] += (st[i] * td);
           }
         }else if(k.search(/fillStyle|strokeStyle|shadowColor/) != -1){
+          //Todo: if(done) ....
           tem = {};
           tem[k] = rgb2hex.apply(this, src);
           el.attr(tem);
