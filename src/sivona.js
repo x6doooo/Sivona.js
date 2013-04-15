@@ -1,6 +1,6 @@
 /*!
 
-  @Title: Sivona v0.0.3
+  @Title: Sivona v0.0.4
   @Link: https://github.com/x6doooo/Sivona.js
   @Copyright: Copyright 2013 Dx. Yang
   @License: Released under the MIT license
@@ -264,7 +264,7 @@ function rgb2hex(r, g, b) {
     }
     return v;
   }
-}var Version = "0.0.3",
+}var Version = "0.0.4",
   /*!
     @Name: SI
     @Info: Sivona.js的命名空间，以及新画布的构造函数
@@ -346,12 +346,9 @@ function getEventPosition(ev){
   return {x: x, y: y};
 }
 /*
- matrix、attributes
  TODO:？？？ path  转换path描述？？？
  Todo: 多个canvas同时执行动画 test
- Todo: 中断动画 test
  Todo: 中断某个元素的动画
- Todo: 暂停和继续
 
     animator = new Animator();
 
@@ -403,7 +400,6 @@ function getEventPosition(ev){
     };
   }
 }());
-
 
 var Animator = new Class;
 Animator.include({
@@ -478,6 +474,23 @@ Animator.include({
       if(amtArr[5] == _id) amtArr.splice(i, 1);
     }
   },
+  pause: function(){
+    this.pauseArr = this.amtArr;
+    this.pauseStamp = +new Date();
+    this.amtArr = [];
+  },
+  process: function(){
+    var amtAttr = this.pauseArr,
+      pauseTime = new Date() - this.pauseStamp,
+      len = amtAttr.length;
+    while(len--){
+      amtAttr[len][4] += pauseTime;
+    }
+    this.amtArr = amtAttr;
+    this.pauseArr = [];
+    this.timeDiff = 1;
+    this.checkStatus();
+  },
   abort: function(){
     this.init();
   },
@@ -526,6 +539,7 @@ Animator.include({
             src[i] += (st[i] * td);
           }
         }else if(k.search(/fillStyle|strokeStyle|shadowColor/) != -1){
+          //Todo: if(done) ....
           tem = {};
           tem[k] = rgb2hex.apply(this, src);
           el.attr(tem);
@@ -564,7 +578,8 @@ Animator.include({
 });
 
 //主动画控制器
-var sanimator = new Animator();/*!
+var sanimator = new Animator();
+/*!
     @Name: Paper
     @Type: Class
     @Info: 画布类，实例拥有各种绘图方法 一般通过SI方法new出实例
@@ -620,7 +635,6 @@ Paper.include({
     self.canvasNode = cn;
     self.canvasContext = cn.getContext('2d');
     self.allElements = [];
-    //Todo: onRender 是控制画布是否即时更新变化，目前这个设置并不理想，需要找个更好的解决方案
     self.onRender = true;
     if(SI.onEvent) self.initEveHandler();
     self.reset();
@@ -783,6 +797,14 @@ Paper.include({
     self.render();
     return el;
   },
+  /*!
+      @Name: paper.group()
+      @Info: 创建图形组
+      @Params:
+      - {Instance} 图形实例
+      @Return:
+      - 实例对象
+   */
   group: function(){
     var self = this,
       arr = to_a(arguments),
@@ -791,6 +813,17 @@ Paper.include({
     g.content = self.canvasContext;
     return g;
   },
+  /*!
+      @Name: paper.text(t, x, y, w)
+      @Info: 绘制文字的方法
+      @Params:
+      - t {String} 文字内容
+      - x {Number} x轴坐标
+      - y {Number} y轴坐标
+      - w {Number} 文字宽度（可选）
+      @Return:
+      - 实例对象
+   */
   text: function(t, x, y, w){
     var self = this,
       el = new Ctext({

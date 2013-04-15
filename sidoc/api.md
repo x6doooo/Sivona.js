@@ -1,6 +1,6 @@
 ===
 
-#Sivona v0.0.3
+#Sivona v0.0.4
 
 @Link: <https://github.com/x6doooo/Sivona.js>
 
@@ -126,6 +126,42 @@ paper.rect(...);
 @Type: Class
 
 @Info: 画布类，实例拥有各种绘图方法 一般通过SI方法new出实例
+
+
+===
+
+@Name: paper.group()
+
+@Info: 创建图形组
+
+@Params:
+
+- {Instance} 图形实例
+
+@Return:
+
+- 实例对象
+
+
+===
+
+@Name: paper.text(t, x, y, w)
+
+@Info: 绘制文字的方法
+
+@Params:
+
+- t {String} 文字内容
+
+- x {Number} x轴坐标
+
+- y {Number} y轴坐标
+
+- w {Number} 文字宽度（可选）
+
+@Return:
+
+- 实例对象
 
 
 ===
