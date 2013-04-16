@@ -1,6 +1,6 @@
 ===
 
-#Sivona v0.0.4
+#Sivona v0.0.5
 
 @Link: <https://github.com/x6doooo/Sivona.js>
 
