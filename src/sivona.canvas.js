@@ -93,7 +93,6 @@ Paper.include({
           isDrag = self.isDrag,
           hasIn = self.hasIn,
           eves = self.eves;
-        if(type == 'mouseover' || type == 'mouseout') return;
         p = getEventPosition(e);
         who = self.whoHasThisPoint(p);
         if(type.search(/click|mousedown|mouseup|dbclick/) != -1){
@@ -477,6 +476,10 @@ Matrix.include({
   init: function(){
     this.matrix = [1, 0, 0, 1, 0, 0];
   },
+  refresh: function(){
+    var paper = this.paper;
+    if(paper.onRender) paper.render();
+  },
   update: function(a, b, c, d, e, f){
     var self = this,
       m = self.matrix,
@@ -515,12 +518,12 @@ Matrix.include({
   },
   translate: function(x, y){
     this.update(1, 0, 0, 1, x, y);
-    if(this.paper.onRender) this.paper.render();
+    this.refresh();
     return this;
   },
   transform: function(a, b, c, d, e, f){
     this.update(a, b, c, d, e, f);
-    if(this.paper.onRender) this.paper.render();
+    this.refresh();
     return this;
   },
   scale: function(sx, sy, x, y){
@@ -528,7 +531,7 @@ Matrix.include({
     (x || y) && this.update(1, 0, 0, 1, x, y);
     this.update(sx, 0, 0, sy, 0, 0);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
-    if(this.paper.onRender) this.paper.render();
+    this.refresh();
     return this;
   },
   rotate: function(a, x, y){
@@ -539,13 +542,13 @@ Matrix.include({
       cosa = toFixed(cos(a), 9);
     this.update(cosa, sina, -sina, cosa, x, y);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
-    if(this.paper.onRender) this.paper.render();
+    this.refresh();
     return this;
   }
 });
 
 //Todo: group在循环组内元素时，每改动一个元素都会触发一次重绘，需要结合重绘调用的配置进行优化
-//Todo: 给一组元素设置事件，触发时是触发单个，还是整体触发？比如拖动，拖一个时，其他动不动？
+//Todo: 单独给一个成员绑事件，只触发该成员事件，给group绑事件则全员触发???
 Cgroup = new Class;
 Cgroup.include({
   init: function(arr){
@@ -627,12 +630,12 @@ Celement.include({
     }else{
       return self;
     }
-    self.paper.render();
+    this.refresh();
     return self;
   },
   show: function(){
     this.display = true;
-    if(this.paper.onRender) this.paper.render();
+    this.refresh();
   },
   hide: function(){
     var self = this,
@@ -644,7 +647,7 @@ Celement.include({
     if(idx >= 0){
       hasIn.splice(idx, 1);
     }
-    if(paper.onRender) paper.render();
+    self.refresh();
   },
   close: function(){
     this.closeit = true;
