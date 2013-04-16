@@ -1,5 +1,5 @@
 var EvArray = new Class,
-  domEvents = ['click', 'mouseover', 'mouseout', 'mousemove', 'mousedown', 'mouseup', 'drag'];
+  domEvents = ['click', 'dbclick', 'mousemove', 'mousedown', 'mouseup', 'drag'];
 
 SI.onEvent = true;
 
