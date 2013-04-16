@@ -2,6 +2,8 @@
  TODO:？？？ path  转换path描述？？？
  Todo: 多个canvas同时执行动画 test
  Todo: 中断某个元素的动画
+ Todo: 增加一组元素的动画，只设置一个CallBack
+ Todo: 优化foreach
 
     animator = new Animator();
 
@@ -62,7 +64,6 @@ Animator.include({
     this.timer = null;
     this.timeDiff = 1;
   },
-  // Todo: 增加一组元素的动画，只设置一个CallBack
   add: function(el, arr){
     //arr = [am, hl, cb]
     var self = this,
@@ -72,48 +73,60 @@ Animator.include({
       hl = arr[1]||500,
       cfg = el.cfg,
       am = extend(true, {}, arr[0]),
-      cb = arr[2] || function(){};
-    forEach(am, function(v, k){
-      if(k == 'translate'){
-        am[k] = {
-          st: [v[0]/hl, v[1]/hl],
-          src: [0, 0],
-          tar: v
-        };
-      }else if(k == 'rotate'){
-        v[1]= v[1] || 0;
-        v[2] = v[2] || 0;
-        am[k] = {
-          st: [v[0]/hl, 0, 0],
-          src: [0, v[1], v[2]],
-          tar: v
-        };
-      }else if(k == 'scale'){
-        v[1] = v[1] || v[0];
-        v[2] = v[2] || 0;
-        v[3] = v[3] || 0;
-        am[k] = {
-          st: [ (v[0]-1)/hl, (v[1]-1)/hl, 0, 0 ],
-          src: [1, 1, v[2], v[3]],
-          tar: v
-        };
-      }else if(k == 'fillStyle' || k == 'strokeStyle'){
-        cfg[k] = hex2num(cfg[k] || '#fff');
-        v = hex2num(v);
-        am[k] = {
-          src: cfg[k],
-          st: [(v[0] - cfg[k][0])/hl, (v[1] - cfg[k][1])/hl, (v[2] - cfg[k][2])/hl],
-          tar: v
-        };
-      }else{
-        cfg[k] = cfg[k] || 0;
-        am[k] = {
-          src: cfg[k],
-          st: [(v[0] - cfg[k][0])/hl, (v[1] - cfg[k][1])/hl, (v[2] - cfg[k][2])/hl],
-          tar: v
-        };
+      cb = arr[2] || function(){},
+      k,
+      v;
+
+    for(k in am){
+      v = am[k];
+      switch(k){
+        case 'translate':
+          am[k] = {
+            st: [v[0]/hl, v[1]/hl],
+            src: [0, 0],
+            tar: v
+          };
+          break;
+        case 'rotate':
+          v[1]= v[1] || 0;
+          v[2] = v[2] || 0;
+          am[k] = {
+            st: [v[0]/hl, 0, 0],
+            src: [0, v[1], v[2]],
+            tar: v
+          };
+          break;
+        case 'scale':
+          v[1] = v[1] || v[0];
+          v[2] = v[2] || 0;
+          v[3] = v[3] || 0;
+          am[k] = {
+            st: [ (v[0]-1)/hl, (v[1]-1)/hl, 0, 0 ],
+            src: [1, 1, v[2], v[3]],
+            tar: v
+          };
+          break;
+        case 'fillStyle':
+        case 'strokeStyle':
+          cfg[k] = hex2num(cfg[k] || '#fff');
+          v = hex2num(v);
+          am[k] = {
+            src: cfg[k],
+            st: [(v[0] - cfg[k][0])/hl, (v[1] - cfg[k][1])/hl, (v[2] - cfg[k][2])/hl],
+            tar: v
+          };
+          break;
+        default:
+          cfg[k] = cfg[k] || 0;
+          am[k] = {
+            src: cfg[k],
+            st: [(v[0] - cfg[k][0])/hl, (v[1] - cfg[k][1])/hl, (v[2] - cfg[k][2])/hl],
+            tar: v
+          };
+          break;
       }
-    });
+    }
+
     amtArr.push([el, am, hl, cb, Date.now(), _id]);
     if(oldStatus == 0){ //不为0则有action在执行
       self.action();
@@ -152,6 +165,7 @@ Animator.include({
       amtArr = self.amtArr,
       td = self.timeDiff,
       el,
+      paper,
       am,
       hl,
       cb,
@@ -163,10 +177,13 @@ Animator.include({
       done,
       len,
       i,
-      v;
+      v,
+      k,
+      val;
     self.stamp = Date.now();
 
     len = amtArr.length;
+
     while(len--){
       v = amtArr[len];
       el = v[0];
@@ -177,7 +194,11 @@ Animator.include({
       pt = (self.stamp - stime);
       done = (hl <= pt);
       el.matrix = [1, 0, 0, 1, 0, 0];
-      forEach(am, function(val, k){
+      paper = el.paper;
+      paper.onRender = false;
+
+      for(k in am){
+        val = am[k];
         src = val.src;
         st = val.st;
         tar = val.tar;
@@ -185,11 +206,11 @@ Animator.include({
           if(done){
             el[k].apply(el, tar);
           }else{
+            i = src.length;
+            while(i--){
+              src[i] += (st[i] * td);
+            }
             el[k].apply(el, src);
-          }
-          i = src.length;
-          while(i--){
-            src[i] += (st[i] * td);
           }
         }else if(k.search(/fillStyle|strokeStyle|shadowColor/) != -1){
           tem = {};
@@ -197,12 +218,12 @@ Animator.include({
             tem[k] = rgb2hex.apply(this, tar);
             el.attr(tem);
           }else{
-            tem[k] = rgb2hex.apply(this, src);
-            el.attr(tem);
             i = src.length;
             while(i--){
               src[i] += (st[i] * td);
             }
+            tem[k] = rgb2hex.apply(this, src);
+            el.attr(tem);
           }
         }else{
           tem = {};
@@ -210,19 +231,20 @@ Animator.include({
             tem[k] = tar;
             el.attr(tem);
           }else{
+            src += (st * td);
             tem[k] = src;
             el.attr(tem);
-            val.src += (st * td);
+            val.src = src;
           }
         }
-        el.paper.render();
-      });
+
+      }
+      paper.render();
       if(done){
         amtArr.splice(len, 1);
         cb.call(el);
       }
     }
-
     SI.cancelAnimationFrame(self.timer);
     self.timer = SI.requestAnimationFrame(function(){
       self.timeDiff = Date.now() - self.stamp;
