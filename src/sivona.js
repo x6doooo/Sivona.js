@@ -412,7 +412,6 @@ Animator.include({
     this.timeDiff = 1;
   },
   add: function(el, arr){
-    //arr = [am, hl, cb]
     var self = this,
       amtArr = self.amtArr,
       oldStatus = amtArr.length,
@@ -786,8 +785,6 @@ Paper.include({
       w = self.width;
       h = self.height;
     }
-    console.log(w);
-    console.log(h);
     ctxt.clearRect(l, t, w, h);
   },
   /*!Private
@@ -1097,6 +1094,18 @@ Matrix.include({
   update: function(a, b, c, d, e, f){
     var self = this,
       m = self.matrix,
+      m0 = m[0],
+      m1 = m[1],
+      m2 = m[2],
+      m3 = m[3],
+      m4 = m[4],
+      m5 = m[5],
+      m6 = m[6];
+    self.matrix = [m0*a + m2*b, m1*a + m3*b, m0*c + m2*d, m1*c + m3*d, m0*e + m2*f + m4, m1*e + m3*f + m5];
+    
+/*
+    var self = this,
+      m = self.matrix,
       ft = [
         [m[0], m[2], m[4]],
         [m[1], m[3], m[5]],
@@ -1109,6 +1118,26 @@ Matrix.include({
       ],
       rs = [[], [], []],
       tm, x, y, z;
+//TODO: 手写矩阵变换
+A=[ 1 2 3]　　　B=[ 1  2  3 ]
+　 [ 4 5 6]　　　　 [ 4  5  6 ]
+　 [ 7 8 9]　　　　 [ 7  8  9 ]
+
+(1*1)+(2*4)+(3*7)＝30
+(1*2)+(2*5)+(3*8)＝36
+(1*3)+(2*6)+(3*9)＝42
+
+(4*1)+(5*4)+(6*7)＝66
+(4*2)+(5*5)+(6*8)＝81
+(4*3)+(5*6)+(6*9)＝96
+
+(7*1)+(8*4)+(9*7)＝102
+(7*2)+(8*5)+(9*8)＝126
+(7*3)+(8*6)+(9*9)＝150
+
+Ａ＊Ｂ＝［　３０　　３６　　４２］
+　　　　［　６６　　８１　　９６］
+　　　　［１０２　１２６　１５０］
     for(x = 0; x < 3; x++){
       for(y = 0; y < 3; y++){
         tm = 0;
@@ -1126,6 +1155,7 @@ Matrix.include({
       rs[0][2],
       rs[1][2]
     ];
+*/
   },
   resetContextMatrix: function(){
     this.context.setTransform(1, 0, 0, 1, 0, 0);

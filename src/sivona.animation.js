@@ -65,7 +65,6 @@ Animator.include({
     this.timeDiff = 1;
   },
   add: function(el, arr){
-    //arr = [am, hl, cb]
     var self = this,
       amtArr = self.amtArr,
       oldStatus = amtArr.length,

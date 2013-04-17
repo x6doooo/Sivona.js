@@ -41,6 +41,10 @@ var PI = Math.PI,
     yellow: '#ff0'
   };
 
+function getUniqId(){
+  return _uniqId++;
+}
+
 function deg2rad(d){
   return d * PI / 180;
 }

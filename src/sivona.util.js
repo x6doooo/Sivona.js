@@ -82,10 +82,6 @@ function extend(){
   return target;
 }
 
-function getUniqId(){
-  return _uniqId++;
-}
-
 /*!
   @Name: Class
   @Info: OOP封装

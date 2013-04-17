@@ -483,34 +483,20 @@ Matrix.include({
   update: function(a, b, c, d, e, f){
     var self = this,
       m = self.matrix,
-      ft = [
-        [m[0], m[2], m[4]],
-        [m[1], m[3], m[5]],
-        [0, 0 ,1]
-      ],
-      bk = [
-        [a, c, e],
-        [b, d, f],
-        [0, 0, 1]
-      ],
-      rs = [[], [], []],
-      tm, x, y, z;
-    for(x = 0; x < 3; x++){
-      for(y = 0; y < 3; y++){
-        tm = 0;
-        for(z = 0; z < 3; z++){
-          tm += ft[x][z] * bk[z][y];
-        }
-        rs[x][y] = tm;
-      }
-    }
+      m0 = m[0],
+      m1 = m[1],
+      m2 = m[2],
+      m3 = m[3],
+      m4 = m[4],
+      m5 = m[5],
+      m6 = m[6];
     self.matrix = [
-      rs[0][0],
-      rs[1][0],
-      rs[0][1],
-      rs[1][1],
-      rs[0][2],
-      rs[1][2]
+      m0 * a + m2 * b, 
+      m1 * a + m3 * b, 
+      m0 * c + m2 * d, 
+      m1 * c + m3 * d, 
+      m0 * e + m2 * f + m4, 
+      m1 * e + m3 * f + m5
     ];
   },
   resetContextMatrix: function(){
