@@ -58,15 +58,16 @@ function hex2num(v){
   if(v.search('#') == -1) v = webColors[v];
   if(v.length == 4){
     v = v.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function(m, r, g, b) {
-      return r + r + g + g + b + b;
-    });
+      return [parseInt(r+r, 16), parseInt(g+g, 16), parseInt(b+b, 16)];
+    }).split(',');
+  }else{
+    v = v.replace(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i, function(m, r, g, b){
+      return [parseInt(r, 16), parseInt(g, 16), parseInt(b, 16)];
+    }).split(',');
   }
-  v = v.replace(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i, function(m, r, g, b){
-    return [parseInt(r, 16), parseInt(g, 16), parseInt(b, 16)];
-  }).split(',');
-  v.forEach(function(val, i, a){
-    a[i] = to_i(val);
-  });
+  v[0] = +v[0];
+  v[1] = +v[1];
+  v[2] = +v[2];
   return v;
 }
 
