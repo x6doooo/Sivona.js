@@ -178,7 +178,7 @@ Celement.include({
     this.closeit = true;
     return this;
   },
-  render: function(){
+  render: function(check){
     var self = this,
       cfg = self.cfg,
       ctx = self.context,
@@ -196,10 +196,10 @@ Celement.include({
     }
     //ctx.lineWidth不能赋予0或其他非数字
     //so 不画边框 就根据cfg来判断
-    if(cfg.lineWidth != 0){
+    if(cfg.lineWidth != 0 && !check){
       ctx.stroke();
     }
-    if(cfg.fillStyle != 'none'){
+    if(cfg.fillStyle != 'none' && !check){
       ctx.fill();
     }
   },

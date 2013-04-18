@@ -440,7 +440,27 @@ Paper.include({
 
    */
   whoHasThisPoint: function(p){
-    return this.render(p);
+    var self = this,
+      allElements = self.allElements,
+      len = allElements.length,
+      ctx = self.canvasContext,
+      which = [],
+      el;
+    ctx.save();
+    allElements.sort(function(a, b){
+      return b.zIndex - a.zIndex;
+    });
+    while(len--){
+      el = allElements[len];
+      if(el.display !== false){
+        el.render(true);
+        if(ctx.isPointInPath(p.x, p.y)){
+          which.push(el);
+        }
+      }
+    }
+    ctx.restore();
+    return which;
   }
 });
 
