@@ -16,7 +16,7 @@ function isEmptyObject(v){
   }
   return true;
 }
-function to_i(v){return parseInt(v, 10);}
+function to_i(v){return ~~v;}
 function to_f(v){return parseFloat(v);}
 function to_s(v){return v + ''};
 function to_a(obj){return [].slice.call(obj, 0);}
