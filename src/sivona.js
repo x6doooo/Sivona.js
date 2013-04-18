@@ -1,6 +1,6 @@
 /*!
 
-  @Title: Sivona v0.0.5
+  @Title: Sivona v0.0.6
   @Link: https://github.com/x6doooo/Sivona.js
   @Copyright: Copyright 2013 Dx. Yang
   @License: Released under the MIT license
@@ -265,7 +265,7 @@ function rgb2hex(r, g, b) {
     }
     return v;
   }
-}var Version = "0.0.5",
+}var Version = "0.0.6",
   /*!
     @Name: SI
     @Info: Sivona.js的命名空间，以及新画布的构造函数
@@ -1015,6 +1015,7 @@ Paper.include({
       检查是否有该点
 
    */
+  //TODO: whoHasThisPoint方法不应该触发实际绘制 所以应该和render拆分开
   render: function(check){
     var self = this,
       allElements = self.allElements,
@@ -1049,7 +1050,27 @@ Paper.include({
 
    */
   whoHasThisPoint: function(p){
-    return this.render(p);
+    var self = this,
+      allElements = self.allElements,
+      len = allElements.length,
+      ctx = self.canvasContext,
+      which = [],
+      el;
+    ctx.save();
+    allElements.sort(function(a, b){
+      return b.zIndex - a.zIndex;
+    });
+    while(len--){
+      el = allElements[len];
+      if(el.display !== false){
+        el.render(true);
+        if(ctx.isPointInPath(p.x, p.y)){
+          which.push(el);
+        }
+      }
+    }
+    ctx.restore();
+    return which;
   }
 });
 
@@ -1233,7 +1254,7 @@ Celement.include({
     this.closeit = true;
     return this;
   },
-  render: function(){
+  render: function(check){
     var self = this,
       cfg = self.cfg,
       ctx = self.context,
@@ -1251,10 +1272,10 @@ Celement.include({
     }
     //ctx.lineWidth不能赋予0或其他非数字
     //so 不画边框 就根据cfg来判断
-    if(cfg.lineWidth != 0){
+    if(cfg.lineWidth != 0 && !check){
       ctx.stroke();
     }
-    if(cfg.fillStyle != 'none'){
+    if(cfg.fillStyle != 'none' && !check){
       ctx.fill();
     }
   },

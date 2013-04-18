@@ -1,4 +1,4 @@
-var Version = "0.0.5",
+var Version = "0.0.6",
   /*!
     @Name: SI
     @Info: Sivona.js的命名空间，以及新画布的构造函数
