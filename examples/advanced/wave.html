@@ -28,8 +28,8 @@ paper.canvasNode.addEventListener('mousemove', function(e){
 		animate({
 			'scale': [10, 10, p.x, p.y]
 		}, 1000, function(){
-			//console.log(this);
 			this.remove();
+			paper.render();
 		});
 
 },false);
