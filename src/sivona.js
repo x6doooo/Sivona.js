@@ -25,7 +25,7 @@ function isEmptyObject(v){
   }
   return true;
 }
-function to_i(v){return parseInt(v, 10);}
+function to_i(v){return ~~v;}
 function to_f(v){return parseFloat(v);}
 function to_s(v){return v + ''};
 function to_a(obj){return [].slice.call(obj, 0);}
@@ -89,10 +89,6 @@ function extend(){
     }
   }
   return target;
-}
-
-function getUniqId(){
-  return _uniqId++;
 }
 
 /*!
@@ -228,6 +224,10 @@ var PI = Math.PI,
     yellow: '#ff0'
   };
 
+function getUniqId(){
+  return _uniqId++;
+}
+
 function deg2rad(d){
   return d * PI / 180;
 }
@@ -241,15 +241,16 @@ function hex2num(v){
   if(v.search('#') == -1) v = webColors[v];
   if(v.length == 4){
     v = v.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function(m, r, g, b) {
-      return r + r + g + g + b + b;
-    });
+      return [parseInt(r+r, 16), parseInt(g+g, 16), parseInt(b+b, 16)];
+    }).split(',');
+  }else{
+    v = v.replace(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i, function(m, r, g, b){
+      return [parseInt(r, 16), parseInt(g, 16), parseInt(b, 16)];
+    }).split(',');
   }
-  v = v.replace(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i, function(m, r, g, b){
-    return [parseInt(r, 16), parseInt(g, 16), parseInt(b, 16)];
-  }).split(',');
-  v.forEach(function(val, i, a){
-    a[i] = to_i(val);
-  });
+  v[0] = +v[0];
+  v[1] = +v[1];
+  v[2] = +v[2];
   return v;
 }
 
@@ -290,7 +291,7 @@ function rgb2hex(r, g, b) {
 
 
 var EvArray = new Class,
-  domEvents = ['click', 'dbclick', 'mousemove', 'mousedown', 'mouseup', 'drag'];
+  domEvents = ['click', 'dbclick', 'mouseout', 'mouseover', 'mousemove', 'mousedown', 'mouseup', 'drag'];
 
 SI.onEvent = true;
 
@@ -350,7 +351,6 @@ function getEventPosition(ev){
  Todo: 多个canvas同时执行动画 test
  Todo: 中断某个元素的动画
  Todo: 增加一组元素的动画，只设置一个CallBack
- Todo: 优化foreach
 
     animator = new Animator();
 
@@ -377,7 +377,7 @@ function getEventPosition(ev){
     x,
     l,
     currTime,
-    timeToCall,
+    time2call,
     id;
   for(x = 0, l = vendors.length; x < l && !window.requestAnimationFrame; ++x) {
     SI.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
@@ -387,11 +387,11 @@ function getEventPosition(ev){
 
   if (!SI.requestAnimationFrame){
     SI.requestAnimationFrame = function(callback, element) {
-      currTime = new Date().getTime();
-      timeToCall = Math.max(0, 16 - (currTime - lastTime));
-      id = window.setTimeout(function() { callback(currTime + timeToCall); },
-        timeToCall);
-      lastTime = currTime + timeToCall;
+      currTime = Date.now();
+      time2call = Math.max(0, 16 - (currTime - lastTime));
+      id = window.setTimeout(function() { callback(currTime + time2call); },
+        time2call);
+      lastTime = currTime + time2call;
       return id;
     };
   }
@@ -541,7 +541,6 @@ Animator.include({
       done = (hl <= pt);
       el.matrix = [1, 0, 0, 1, 0, 0];
       paper = el.paper;
-      paper.onRender = false;
 
       for(k in am){
         val = am[k];
@@ -615,13 +614,6 @@ var sanimator = new Animator();
     @Info: 画布类，实例拥有各种绘图方法 一般通过SI方法new出实例
  */
 var Paper,
-  Matrix,
-  Cgroup,
-  Celement,
-  Crect,
-  Carc,
-  Cellipse,
-  Cpath,
 //TODO: T\S命令
   order2func = {
     'M': 'moveTo',
@@ -659,13 +651,12 @@ Paper.include({
       cn.style.top = t + 'px';
       cn.style.left = l + 'px';
     }
-    cn.id = container_id + '_canvas';
+    cn.id = container_id + '_canvas_' + getUniqId();
     ct.appendChild(cn);
     self.container = ct;
     self.canvasNode = cn;
     self.canvasContext = cn.getContext('2d');
     self.allElements = [];
-    self.onRender = true;
     if(SI.onEvent) self.initEveHandler();
     self.reset();
   },
@@ -677,7 +668,6 @@ Paper.include({
       Todo: image
       Todo: clip
       Todo: pattern
-      Todo: group 将多个图形设置成组
       Todo: drag方法不触发click
       Todo: 解除绑定 & 全部解除
    */
@@ -767,9 +757,9 @@ Paper.include({
    */
   reset: function(){
     var self = this,
-      context = self.canvasContext;
+      ctx = self.canvasContext;
     forEach(defaultCfg, function(v, k){
-      context[k] = v;
+      ctx[k] = v;
     });
   },
   /*!Private
@@ -778,14 +768,14 @@ Paper.include({
    */
   clear: function(l, t, w, h){
     var self = this,
-      ctxt = self.canvasContext;
+      ctx = self.canvasContext;
     if(arguments.length == 0){
       l = 0;
       t = 0;
       w = self.width;
       h = self.height;
     }
-    ctxt.clearRect(l, t, w, h);
+    ctx.clearRect(l, t, w, h);
   },
   /*!Private
       创建图形时初始化一些属性
@@ -823,7 +813,7 @@ Paper.include({
       })(event);
     }
     els.push(el);
-    self.render();
+    //self.render();
     return el;
   },
   /*!
@@ -839,7 +829,7 @@ Paper.include({
       arr = to_a(arguments),
       g = new Cgroup(arr);
     g.paper = self;
-    g.content = self.canvasContext;
+    g.context = self.canvasContext;
     return g;
   },
   /*!
@@ -1063,12 +1053,15 @@ Paper.include({
   }
 });
 
+var Matrix, Cgroup, Celement,
+    Crect, Carc, Cellipse, Cpath;
+
 /*!Private
 
-    @Name: Matrix
-    @Info: 矩阵变换类，是Celement的父类。
-    @Type: Class
-    @Params: 无
+ @Name: Matrix
+ @Info: 矩阵变换类，是Celement的父类。
+ @Type: Class
+ @Params: 无
 
  */
 
@@ -1087,10 +1080,6 @@ Matrix.include({
   init: function(){
     this.matrix = [1, 0, 0, 1, 0, 0];
   },
-  refresh: function(){
-    var paper = this.paper;
-    if(paper.onRender) paper.render();
-  },
   update: function(a, b, c, d, e, f){
     var self = this,
       m = self.matrix,
@@ -1101,73 +1090,24 @@ Matrix.include({
       m4 = m[4],
       m5 = m[5],
       m6 = m[6];
-    self.matrix = [m0*a + m2*b, m1*a + m3*b, m0*c + m2*d, m1*c + m3*d, m0*e + m2*f + m4, m1*e + m3*f + m5];
-    
-/*
-    var self = this,
-      m = self.matrix,
-      ft = [
-        [m[0], m[2], m[4]],
-        [m[1], m[3], m[5]],
-        [0, 0 ,1]
-      ],
-      bk = [
-        [a, c, e],
-        [b, d, f],
-        [0, 0, 1]
-      ],
-      rs = [[], [], []],
-      tm, x, y, z;
-//TODO: 手写矩阵变换
-A=[ 1 2 3]　　　B=[ 1  2  3 ]
-　 [ 4 5 6]　　　　 [ 4  5  6 ]
-　 [ 7 8 9]　　　　 [ 7  8  9 ]
-
-(1*1)+(2*4)+(3*7)＝30
-(1*2)+(2*5)+(3*8)＝36
-(1*3)+(2*6)+(3*9)＝42
-
-(4*1)+(5*4)+(6*7)＝66
-(4*2)+(5*5)+(6*8)＝81
-(4*3)+(5*6)+(6*9)＝96
-
-(7*1)+(8*4)+(9*7)＝102
-(7*2)+(8*5)+(9*8)＝126
-(7*3)+(8*6)+(9*9)＝150
-
-Ａ＊Ｂ＝［　３０　　３６　　４２］
-　　　　［　６６　　８１　　９６］
-　　　　［１０２　１２６　１５０］
-    for(x = 0; x < 3; x++){
-      for(y = 0; y < 3; y++){
-        tm = 0;
-        for(z = 0; z < 3; z++){
-          tm += ft[x][z] * bk[z][y];
-        }
-        rs[x][y] = tm;
-      }
-    }
     self.matrix = [
-      rs[0][0],
-      rs[1][0],
-      rs[0][1],
-      rs[1][1],
-      rs[0][2],
-      rs[1][2]
+      m0 * a + m2 * b,
+      m1 * a + m3 * b,
+      m0 * c + m2 * d,
+      m1 * c + m3 * d,
+      m0 * e + m2 * f + m4,
+      m1 * e + m3 * f + m5
     ];
-*/
   },
   resetContextMatrix: function(){
     this.context.setTransform(1, 0, 0, 1, 0, 0);
   },
   translate: function(x, y){
     this.update(1, 0, 0, 1, x, y);
-    this.refresh();
     return this;
   },
   transform: function(a, b, c, d, e, f){
     this.update(a, b, c, d, e, f);
-    this.refresh();
     return this;
   },
   scale: function(sx, sy, x, y){
@@ -1175,7 +1115,6 @@ A=[ 1 2 3]　　　B=[ 1  2  3 ]
     (x || y) && this.update(1, 0, 0, 1, x, y);
     this.update(sx, 0, 0, sy, 0, 0);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
-    this.refresh();
     return this;
   },
   rotate: function(a, x, y){
@@ -1186,7 +1125,6 @@ A=[ 1 2 3]　　　B=[ 1  2  3 ]
       cosa = toFixed(cos(a), 9);
     this.update(cosa, sina, -sina, cosa, x, y);
     (x || y) && this.update(1, 0, 0, 1, -x, -y);
-    this.refresh();
     return this;
   }
 });
@@ -1197,7 +1135,7 @@ Cgroup = new Class;
 Cgroup.include({
   init: function(arr){
     var self = this;
-      self.els = arr,
+    self.els = arr,
       methods = ['show', 'hide', 'attr'];
     methods.forEach(function(v){
       self[v] = function(){
@@ -1219,7 +1157,7 @@ Cgroup.include({
 });
 
 /*!
-    @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
+ @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
  */
 Celement = new Class(Matrix);
 Celement.include({
@@ -1274,12 +1212,10 @@ Celement.include({
     }else{
       return self;
     }
-    this.refresh();
     return self;
   },
   show: function(){
     this.display = true;
-    this.refresh();
   },
   hide: function(){
     var self = this,
@@ -1287,11 +1223,11 @@ Celement.include({
       hasIn = paper.hasIn,
       idx;
     self.display = false;
+    //if(!hasIn) return;
     idx = hasIn.indexOf(this);
     if(idx >= 0){
       hasIn.splice(idx, 1);
     }
-    self.refresh();
   },
   close: function(){
     this.closeit = true;
@@ -1337,7 +1273,6 @@ Celement.include({
     domEvents.forEach(function(event){
       self['un'+event]();
     });
-    if(self.paper.onRender) self.paper.render();
   }
 });
 

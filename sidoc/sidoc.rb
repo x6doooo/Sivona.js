@@ -13,6 +13,7 @@ config = [
     'event.js',
     'animation.js',
     'canvas.js',
+    'shapes.js',
     'exports.js',
     'suffix'
 ]
