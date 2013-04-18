@@ -3,7 +3,6 @@
  Todo: 多个canvas同时执行动画 test
  Todo: 中断某个元素的动画
  Todo: 增加一组元素的动画，只设置一个CallBack
- Todo: 优化foreach
 
     animator = new Animator();
 
@@ -30,7 +29,7 @@
     x,
     l,
     currTime,
-    timeToCall,
+    time2call,
     id;
   for(x = 0, l = vendors.length; x < l && !window.requestAnimationFrame; ++x) {
     SI.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
@@ -40,11 +39,11 @@
 
   if (!SI.requestAnimationFrame){
     SI.requestAnimationFrame = function(callback, element) {
-      currTime = new Date().getTime();
-      timeToCall = Math.max(0, 16 - (currTime - lastTime));
-      id = window.setTimeout(function() { callback(currTime + timeToCall); },
-        timeToCall);
-      lastTime = currTime + timeToCall;
+      currTime = Date.now();
+      time2call = Math.max(0, 16 - (currTime - lastTime));
+      id = window.setTimeout(function() { callback(currTime + time2call); },
+        time2call);
+      lastTime = currTime + time2call;
       return id;
     };
   }
@@ -194,7 +193,6 @@ Animator.include({
       done = (hl <= pt);
       el.matrix = [1, 0, 0, 1, 0, 0];
       paper = el.paper;
-      paper.onRender = false;
 
       for(k in am){
         val = am[k];
