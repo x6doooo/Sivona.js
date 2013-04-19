@@ -303,12 +303,11 @@ EvArray.include({
     this.event = event;
   },
   push: function(el){
-    var self = this,
-      els = self.els;
-    els.push(el);
+    this.els.push(el);
   },
   delete: function(el, func){
-    this.els.forEach(function(v, i, a){
+    var els = this.els;
+    els.forEach(function(v, i, a){
       if(v.target == el && (func ? v.handle == func : true)){
         a.splice(i, 1);
       }
@@ -320,7 +319,9 @@ EvArray.include({
   handle: function(whichs, e){
     var self = this,
       els = self.els,
-      el = whichs[whichs.length-1];
+      el = whichs[whichs.length-1],
+      nowPos,
+      oldPos;
     els.forEach(function(v, i, a){
       if(v.target == el){
         if(v.type == 'drag'){
@@ -621,9 +622,7 @@ var Paper,
     'Q': 'quadraticCurveTo',
     'C': 'bezierCurveTo',
     'Z': 'closePath'
-  },
-  regodr = /[MLQCZHV]/gi;
-  regodr_lower = /[mlqc]/g;
+  };
 
 Paper = new Class;
 Paper.include({
@@ -687,7 +686,8 @@ Paper.include({
       self.eves[event] = new EvArray(self, event);
       node.addEventListener(event, function(e){
         var type = e.type,
-          p, who, tem,
+          p,
+          who,
           tem_over = [],
           tem_out = [],
           tem_move = [],
@@ -1016,6 +1016,9 @@ Paper.include({
 
    */
   //TODO: whoHasThisPoint方法不应该触发实际绘制 所以应该和render拆分开
+  refresh: function(){
+    this.render();
+  },
   render: function(check){
     var self = this,
       allElements = self.allElements,
@@ -1023,14 +1026,14 @@ Paper.include({
       ctx = self.canvasContext,
       which = [],
       el;
-    self.clear();
+    if(!check) self.clear();
     allElements.sort(function(a, b){
       return b.zIndex - a.zIndex;
     });
     while(len--){
       el = allElements[len];
       if(el.display !== false){
-        el.render();
+        el.render(check);
         if(check && ctx.isPointInPath(check.x, check.y)){
           which.push(el);
         }
@@ -1051,31 +1054,19 @@ Paper.include({
    */
   whoHasThisPoint: function(p){
     var self = this,
-      allElements = self.allElements,
-      len = allElements.length,
       ctx = self.canvasContext,
-      which = [],
-      el;
+      which = [];
     ctx.save();
-    allElements.sort(function(a, b){
-      return b.zIndex - a.zIndex;
-    });
-    while(len--){
-      el = allElements[len];
-      if(el.display !== false){
-        el.render(true);
-        if(ctx.isPointInPath(p.x, p.y)){
-          which.push(el);
-        }
-      }
-    }
+    which = self.render(p);
     ctx.restore();
     return which;
   }
 });
 
 var Matrix, Cgroup, Celement,
-    Crect, Carc, Cellipse, Cpath;
+    Crect, Carc, Cellipse, Cpath,
+    regodr = /[MLQCZHV]/gi,
+    regodr_lower = /[mlqc]/g;
 
 /*!Private
 
@@ -1244,7 +1235,6 @@ Celement.include({
       hasIn = paper.hasIn,
       idx;
     self.display = false;
-    //if(!hasIn) return;
     idx = hasIn.indexOf(this);
     if(idx >= 0){
       hasIn.splice(idx, 1);
@@ -1270,12 +1260,15 @@ Celement.include({
     if(self.closeit === true){
       ctx.closePath();
     }
+
+    //如果是由whoHasThisPoint方法触发的render，不需要进行实际绘制
+    if(check) return;
     //ctx.lineWidth不能赋予0或其他非数字
     //so 不画边框 就根据cfg来判断
-    if(cfg.lineWidth != 0 && !check){
+    if(cfg.lineWidth != 0){
       ctx.stroke();
     }
-    if(cfg.fillStyle != 'none' && !check){
+    if(cfg.fillStyle != 'none'){
       ctx.fill();
     }
   },
