@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title> Sivona.js Examples </title>
+	<script src="../../src/sivona.js"></script>
+</head>
+<body id="paper" style="margin:0;padding:0;background:#000;">
+<script>
+paper = SI('paper');
+
+getEventPosition = SI.getEventPosition;
+
+timer = null
+
+paper.canvasNode.addEventListener('mousemove', function(e){
+
+	p = getEventPosition(e);
+
+	if(timer && Date.now() - timer < 80){
+		return;
+	}
+
+	timer = Date.now();
+
+	paper.circle(p.x, p.y, 10).
+		attr({fillStyle: 'none', lineWidth: 0.5, strokeStyle: '#369'}).
+		animate({
+			'scale': [10, 10, p.x, p.y]
+		}, 1000, function(){
+			this.remove();
+			paper.render();
+		});
+
+},false);
+
+</script>
+</body>
+</html>
+</body>
+</html>
