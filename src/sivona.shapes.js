@@ -1,5 +1,12 @@
-var Matrix, Cgroup, Celement,
-    Crect, Carc, Cellipse, Cpath;
+var Matrix,
+    Cgroup,
+    Celement,
+    Crect,
+    Carc,
+    Cellipse,
+    Cpath,
+    regodr = /[MLQCZHV]/gi,
+    regodr_lower = /[mlqc]/g;
 
 /*!Private
 
@@ -74,7 +81,6 @@ Matrix.include({
   }
 });
 
-//Todo: group在循环组内元素时，每改动一个元素都会触发一次重绘，需要结合重绘调用的配置进行优化
 //Todo: 单独给一个成员绑事件，只触发该成员事件，给group绑事件则全员触发???
 Cgroup = new Class;
 Cgroup.include({
@@ -168,7 +174,6 @@ Celement.include({
       hasIn = paper.hasIn,
       idx;
     self.display = false;
-    //if(!hasIn) return;
     idx = hasIn.indexOf(this);
     if(idx >= 0){
       hasIn.splice(idx, 1);
@@ -194,12 +199,15 @@ Celement.include({
     if(self.closeit === true){
       ctx.closePath();
     }
+
+    //如果是由whoHasThisPoint方法触发的render，不需要进行实际绘制
+    if(check) return;
     //ctx.lineWidth不能赋予0或其他非数字
     //so 不画边框 就根据cfg来判断
-    if(cfg.lineWidth != 0 && !check){
+    if(cfg.lineWidth != 0){
       ctx.stroke();
     }
-    if(cfg.fillStyle != 'none' && !check){
+    if(cfg.fillStyle != 'none'){
       ctx.fill();
     }
   },
@@ -306,33 +314,33 @@ Cpath.extend({
       if(arr.length !== 0){
         last_points = arr[arr.length-1].points;
         len = last_points.length;
-        lastX = last_points[len-2]*1;
-        lastY = last_points[len-1]*1;
+        lastX = +last_points[len-2];
+        lastY = +last_points[len-1];
       }
       if(type.search(regodr_lower) !== -1){
-        points[0] = points[0]*1 + lastX;
-        points[1] = points[1]*1 + lastY;
+        points[0] = +points[0] + lastX;
+        points[1] = +points[1] + lastY;
         if(points.length > 2){
-          points[2] = points[2]*1 + lastX;
-          points[3] = points[3]*1 + lastY;
+          points[2] = +points[2] + lastX;
+          points[3] = +points[3] + lastY;
         }
         if(points.length > 4){
-          points[4] = points[4]*1 + lastX;
-          points[5] = points[5]*1 + lastY;
+          points[4] = +points[4] + lastX;
+          points[5] = +points[5] + lastY;
         }
         type = type.toUpperCase();
       }
       if(type == 'H' || type == 'h'){
         points[1] = lastY;
         if(type == 'h'){
-          points[0] = points[0]*1 + lastX;
+          points[0] = +points[0] + lastX;
         }
         type = 'L';
       }
       if(type == 'V' || type == 'v'){
         points[1] = points[0];
         if(type == 'v'){
-          points[1] = points[1]*1 + lastY;
+          points[1] = +points[1] + lastY;
         }
         points[0] = lastX;
         type = 'L';

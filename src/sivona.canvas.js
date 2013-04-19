@@ -11,9 +11,7 @@ var Paper,
     'Q': 'quadraticCurveTo',
     'C': 'bezierCurveTo',
     'Z': 'closePath'
-  },
-  regodr = /[MLQCZHV]/gi;
-  regodr_lower = /[mlqc]/g;
+  };
 
 Paper = new Class;
 Paper.include({
@@ -74,10 +72,11 @@ Paper.include({
 
     while(len--){
       event = events[len];
-      self.eves[event] = new EvArray(self, event);
+      self.eves[event] = new EvArray(self);
       node.addEventListener(event, function(e){
         var type = e.type,
-          p, who, tem,
+          p,
+          who,
           tem_over = [],
           tem_out = [],
           tem_move = [],
@@ -372,6 +371,14 @@ Paper.include({
     el.shapeType = 'path';
     return self.initShape(el);
   },
+  /*!
+   @Name: clone
+   @Info: 赋值一个图形
+   @Type: Method
+   @Params:
+   - el {Instance} 图形实例
+   @Return: 图形实例
+   */
   clone: function(el){
     var self = this,
       tem = null,
@@ -397,6 +404,9 @@ Paper.include({
     tem.zIndex = cf.zIndex;
     return tem;
   },
+  refresh: function(){
+    this.render();
+  },
   /*!Private
 
       清空画布 重绘一帧
@@ -405,7 +415,6 @@ Paper.include({
       检查是否有该点
 
    */
-  //TODO: whoHasThisPoint方法不应该触发实际绘制 所以应该和render拆分开
   render: function(check){
     var self = this,
       allElements = self.allElements,
@@ -413,14 +422,14 @@ Paper.include({
       ctx = self.canvasContext,
       which = [],
       el;
-    self.clear();
+    if(!check) self.clear();
     allElements.sort(function(a, b){
       return b.zIndex - a.zIndex;
     });
     while(len--){
       el = allElements[len];
       if(el.display !== false){
-        el.render();
+        el.render(check);
         if(check && ctx.isPointInPath(check.x, check.y)){
           which.push(el);
         }
@@ -441,24 +450,10 @@ Paper.include({
    */
   whoHasThisPoint: function(p){
     var self = this,
-      allElements = self.allElements,
-      len = allElements.length,
       ctx = self.canvasContext,
-      which = [],
-      el;
+      which = [];
     ctx.save();
-    allElements.sort(function(a, b){
-      return b.zIndex - a.zIndex;
-    });
-    while(len--){
-      el = allElements[len];
-      if(el.display !== false){
-        el.render(true);
-        if(ctx.isPointInPath(p.x, p.y)){
-          which.push(el);
-        }
-      }
-    }
+    which = self.render(p);
     ctx.restore();
     return which;
   }

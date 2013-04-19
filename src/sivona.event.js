@@ -4,19 +4,16 @@ var EvArray = new Class,
 SI.onEvent = true;
 
 EvArray.include({
-  init: function(paper, event){
+  init: function(paper){
     this.els = [];
     this.paper = paper;
-    this.node = paper.canvasNode;
-    this.event = event;
   },
   push: function(el){
-    var self = this,
-      els = self.els;
-    els.push(el);
+    this.els.push(el);
   },
   delete: function(el, func){
-    this.els.forEach(function(v, i, a){
+    var els = this.els;
+    els.forEach(function(v, i, a){
       if(v.target == el && (func ? v.handle == func : true)){
         a.splice(i, 1);
       }
@@ -28,7 +25,9 @@ EvArray.include({
   handle: function(whichs, e){
     var self = this,
       els = self.els,
-      el = whichs[whichs.length-1];
+      el = whichs[whichs.length-1],
+      nowPos,
+      oldPos;
     els.forEach(function(v, i, a){
       if(v.target == el){
         if(v.type == 'drag'){

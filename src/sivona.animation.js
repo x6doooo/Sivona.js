@@ -31,6 +31,7 @@
     currTime,
     time2call,
     id;
+
   for(x = 0, l = vendors.length; x < l && !window.requestAnimationFrame; ++x) {
     SI.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
     SI.cancelAnimationFrame =
