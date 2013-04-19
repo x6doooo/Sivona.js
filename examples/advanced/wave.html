@@ -3,36 +3,21 @@
 <head>
 	<meta charset="utf-8"/>
 	<title> Sivona.js Examples </title>
-	<script src="../../src/sivona.js"></script>
+	<script type="text/javascript" src="../../src/sivona.js"></script>
 </head>
-<body id="paper" style="margin:0;padding:0;background:#000;">
+<body id="paper" style="margin:0;padding:0;background:#333">
 <script>
-paper = SI('paper');
 
-getEventPosition = SI.getEventPosition;
+	wave1 = SI('paper');
 
-timer = null
+	w = wave1.width;
+	h = wave1.height;
 
-paper.canvasNode.addEventListener('mousemove', function(e){
+	start = [0, h];
+	first = [0, h/2];
 
-	p = getEventPosition(e);
 
-	if(timer && Date.now() - timer < 80){
-		return;
-	}
 
-	timer = Date.now();
-
-	paper.circle(p.x, p.y, 10).
-		attr({fillStyle: 'none', lineWidth: 0.5, strokeStyle: '#369'}).
-		animate({
-			'scale': [10, 10, p.x, p.y]
-		}, 1000, function(){
-			this.remove();
-			paper.render();
-		});
-
-},false);
 
 </script>
 </body>
