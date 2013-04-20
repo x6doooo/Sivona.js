@@ -39,7 +39,7 @@
   }
 
   if (!SI.requestAnimationFrame){
-    SI.requestAnimationFrame = function(callback, element) {
+    SI.requestAnimationFrame = function(callback) {
       currTime = Date.now();
       time2call = Math.max(0, 16 - (currTime - lastTime));
       id = window.setTimeout(function() { callback(currTime + time2call); },
@@ -136,7 +136,7 @@ Animator.include({
     var amtArr = this.amtArr,
       len = amtArr.length;
     while(len--){
-      if(amtArr[5] == _id) amtArr.splice(i, 1);
+      if(amtArr[5] == _id) amtArr.splice(len, 1);
     }
   },
   pause: function(){
@@ -178,8 +178,11 @@ Animator.include({
       i,
       v,
       k,
-      val;
-    self.stamp = Date.now();
+      sTime,
+      val,
+      selfStamp;
+
+    selfStamp = self.stamp = Date.now();
 
     len = amtArr.length;
 
@@ -189,8 +192,8 @@ Animator.include({
       am = v[1];
       hl = v[2];
       cb = v[3];
-      stime = v[4];
-      pt = (self.stamp - stime);
+      sTime = v[4];
+      pt = (selfStamp - sTime);
       done = (hl <= pt);
       el.matrix = [1, 0, 0, 1, 0, 0];
       paper = el.paper;
