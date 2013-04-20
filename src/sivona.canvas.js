@@ -451,7 +451,7 @@ Paper.include({
   whoHasThisPoint: function(p){
     var self = this,
       ctx = self.canvasContext,
-      which = [];
+      which;
     ctx.save();
     which = self.render(p);
     ctx.restore();
