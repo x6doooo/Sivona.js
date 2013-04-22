@@ -11,8 +11,8 @@ SI.getEventPosition = getEventPosition;
   @Return:
   - {array}
   @Usage:
-  arr = SI.parsePath('M10,10L10,10C-10-10...');
-  //arr = [{type:'moveTo',points:[10,10]}, {type:'lineTo',points:[10,10]}...]
+  | arr = SI.parsePath('M10,10L10,10C-10-10...');
+  | //arr => [{type:'moveTo',points:[10,10]}, {type:'lineTo',points:[10,10]}...]
 
 */
 SI.parsePath = Cpath.parse;

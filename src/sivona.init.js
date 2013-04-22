@@ -12,8 +12,8 @@ var Version = "0.0.6",
     @Return:
     - {instance} Paper对象的实例
     @Usage:
-      var paper = SI('div1', 100, 200);
-      paper.rect(...);
+    |  var paper = SI('div1', 100, 200);
+    |  paper.rect(...);
   */
   SI = function(id, w, h, t, l){
     return new SI.Paper(id, w, h, t, l);

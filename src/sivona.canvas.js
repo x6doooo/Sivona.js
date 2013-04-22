@@ -334,32 +334,32 @@ Paper.include({
     return self.initShape(el);
   },
   /*!
-   @Name: path
+   @Name: paper.path
    @Info: 路径方法
    @Type: Method
    @Params:
    - {JSON or String} 描述路径的json或者string，如果是string，会由内置的parse转换成json
    @return: path实例
    @Usage:
-
-   pathString = "Mx,yLx,y..."
-
-   pathJSON = [
-    {type:'moveTo', points: [x, y]},
-    {type:'lineTo', points: [x, y]},
-    {type:'quadraticCurveTo', points: [x1, y1, x2, y2]},
-    {type:'bezierCurveTo', points: [x1, y1, x2, y2, x3, y3]}
-    {type:'closePath'},
-    {type:'moveTo', points: [x, y]},
-    ...
-   ];
-
-   paper.path(pathString);
-
-   //or
-
-   paper.path(pathJSON);
-
+   | 
+   |  pathString = "Mx,yLx,y..."
+   |
+   |  pathJSON = [
+   |    {type:'moveTo', points: [x, y]},
+   |    {type:'lineTo', points: [x, y]},
+   |    {type:'quadraticCurveTo', points: [x1, y1, x2, y2]},
+   |    {type:'bezierCurveTo', points: [x1, y1, x2, y2, x3, y3]}
+   |    {type:'closePath'},
+   |    {type:'moveTo', points: [x, y]},
+   |    ...
+   |  ];
+   |
+   |  paper.path(pathString);
+   |
+   |  //or
+   |
+   |  paper.path(pathJSON);
+   |
    */
   path: function(json){
     var self = this,

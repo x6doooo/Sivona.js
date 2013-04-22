@@ -111,25 +111,29 @@ function extend(){
   ***
 
   @Usage:
-    //创建父类
-    Dad = new Class;
-    Dad.extend({
-      say: function(){...}  //类方法
-    });
-    Dad.include({
-      init: function(){...} //init方法会在创建实例时自动调用
-      look: function(){...} //原型方法
-    });
-
-    //创建子类，子类继承父类
-    Son = new Class(Dad);
-    Son.inlcude({
-      look: function(){ //覆盖父类的方法
-        this._super();  //调用父类的同名方法 和其他语言的super功能相似
-        ...
-      }
-    });
-    tom = new Son;  //创建实例
+  |  //创建父类
+  |  Dad = new Class;
+  |
+  |  Dad.extend({
+  |    say: function(){...}  //类方法
+  |  });
+  |
+  |  Dad.include({
+  |    init: function(){...} //init方法会在创建实例时自动调用
+  |    look: function(){...} //原型方法
+  |  });
+  |
+  |  //创建子类，子类继承父类
+  |  Son = new Class(Dad);
+  |
+  |  Son.inlcude({
+  |    look: function(){ //覆盖父类的方法
+  |      this._super();  //调用父类的同名方法 和其他语言的super功能相似
+  |      ...
+  |    }
+  |  });
+  |
+  |  tom = new Son;  //创建实例
 
 */
 var Class = function(parent){

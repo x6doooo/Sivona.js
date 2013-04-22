@@ -54,17 +54,25 @@
       clearTimeout(id);
     };
   }
-}());
+})();
+
+/*!Private
+
+  @Name: Animator
+  @Type: Class
+  @Info: 动画控制器。SI.animationController是它的一个实例，该实例可以控制由shape.animate()生成的动画。
+
+ */
 
 var Animator = new Class;
 Animator.include({
-  init: function(){
+  init: function() {
     this.amtArr = [];
     this.stamp = null;
     this.timer = null;
     this.timeDiff = 1;
   },
-  add: function(el, arr){
+  add: function(el, arr) {
     var self = this,
       amtArr = self.amtArr,
       oldStatus = amtArr.length,
@@ -72,7 +80,7 @@ Animator.include({
       hl = arr[1]||500,
       cfg = el.cfg,
       am = extend(true, {}, arr[0]),
-      cb = arr[2] || function(){},
+      cb = arr[2] || function() {},
       k,
       v;
 
