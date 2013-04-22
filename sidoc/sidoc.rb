@@ -21,10 +21,28 @@ class Src_loader
 end
 
 class File_maker
-  attr_accessor :content
+  attr_accessor :content, :api_doc
+  def format_api_doc
+    @api_doc = @content.scan(/\/\*![^Private][^*]*\*+(?:[^*\/][^*]*\*+)*\//)
+    @api_doc = @api_doc.map{|line|
+      line = line.gsub(/^\s+|^\t+/, "")
+      line = line.gsub(/\n/, "\n\n")
+      line = line.gsub(/\/\*\!/, "===")
+      line = line.gsub(/\*\//, "\n")
+      line = line.gsub(/@Title:\s*/, "\#")
+      line = line.gsub(/(@Link\:\s*)(.+$)/, '\\1<\\2>')
+    }
+    @api_doc = @api_doc.join
+  end
+  def export_api_doc(f)
+    if @api_doc.nil?
+      format_api_doc
+    end
+    export(f, @api_doc)
+  end
   def export(f, c)
     File.open(f, 'w') do |file|
-      file.write(c);
+      file.write(c)
     end
     puts "--- export #{f} done"
   end
@@ -35,7 +53,7 @@ end
 
 loader = Src_loader.new
 loader.src_path = '../src/sivona.'
-loader.file_name_list = %W{
+loader.file_name_list = %W(
     prefix
     util.js
     const.js
@@ -46,47 +64,12 @@ loader.file_name_list = %W{
     shapes.js
     exports.js
     suffix
-}
+)
 
 loader.format_path
 
 maker = File_maker.new
 maker.content = loader.load
 maker.export_whole_file '../src/sivona.js'
-
-#whole_file = '../src/sivona.js'
-#api_doc = './api.md'
-
-=begin
-heads = {
-    "@Title" => "#;",
-    "@Link" => "<;>",
-    "@Copyright" => "",
-    "@License" => ""
-}
-tags = [
-    "@Params",
-    "@Info",
-    "@Type",
-    "@Usage",
-    "@Return"
-]
-
-files = files.scan(/\/\*![^Private][^*]*\*+(?:[^*\/][^*]*\*+)*\//)
-
-files = files.map do |line|
-  line = line.gsub(/^\s+|^\t+/, "")
-  line = line.gsub(/\n/, "\n\n")
-  line = line.gsub(/\/\*\!/, "===")
-  line = line.gsub(/\*\//, "\n")
-  line = line.gsub(/@Title:\s*/, "\#")
-  line = line.gsub(/(@Link\:\s*)(.+$)/, '\\1<\\2>')
-end
-
-puts files.inspect
-
-File.open(api_doc, 'w') do |file|
-  file.write(files.join)
-end
-=end
+maker.export_api_doc './api.md'
 

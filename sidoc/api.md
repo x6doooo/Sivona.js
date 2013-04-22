@@ -295,6 +295,21 @@ paper.path(pathJSON);
 
 ===
 
+@Name: clone
+
+@Info: 赋值一个图形
+
+@Type: Method
+
+@Params:
+
+- el {Instance} 图形实例
+
+@Return: 图形实例
+
+
+===
+
 @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
 
 

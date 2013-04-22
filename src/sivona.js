@@ -296,11 +296,9 @@ var EvArray = new Class,
 SI.onEvent = true;
 
 EvArray.include({
-  init: function(paper, event){
+  init: function(paper){
     this.els = [];
     this.paper = paper;
-    this.node = paper.canvasNode;
-    this.event = event;
   },
   push: function(el){
     this.els.push(el);
@@ -380,6 +378,7 @@ function getEventPosition(ev){
     currTime,
     time2call,
     id;
+
   for(x = 0, l = vendors.length; x < l && !window.requestAnimationFrame; ++x) {
     SI.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
     SI.cancelAnimationFrame =
@@ -387,7 +386,7 @@ function getEventPosition(ev){
   }
 
   if (!SI.requestAnimationFrame){
-    SI.requestAnimationFrame = function(callback, element) {
+    SI.requestAnimationFrame = function(callback) {
       currTime = Date.now();
       time2call = Math.max(0, 16 - (currTime - lastTime));
       id = window.setTimeout(function() { callback(currTime + time2call); },
@@ -484,7 +483,7 @@ Animator.include({
     var amtArr = this.amtArr,
       len = amtArr.length;
     while(len--){
-      if(amtArr[5] == _id) amtArr.splice(i, 1);
+      if(amtArr[5] == _id) amtArr.splice(len, 1);
     }
   },
   pause: function(){
@@ -526,8 +525,11 @@ Animator.include({
       i,
       v,
       k,
-      val;
-    self.stamp = Date.now();
+      sTime,
+      val,
+      selfStamp;
+
+    selfStamp = self.stamp = Date.now();
 
     len = amtArr.length;
 
@@ -537,8 +539,8 @@ Animator.include({
       am = v[1];
       hl = v[2];
       cb = v[3];
-      stime = v[4];
-      pt = (self.stamp - stime);
+      sTime = v[4];
+      pt = (selfStamp - sTime);
       done = (hl <= pt);
       el.matrix = [1, 0, 0, 1, 0, 0];
       paper = el.paper;
@@ -683,7 +685,7 @@ Paper.include({
 
     while(len--){
       event = events[len];
-      self.eves[event] = new EvArray(self, event);
+      self.eves[event] = new EvArray(self);
       node.addEventListener(event, function(e){
         var type = e.type,
           p,
@@ -982,6 +984,14 @@ Paper.include({
     el.shapeType = 'path';
     return self.initShape(el);
   },
+  /*!
+   @Name: clone
+   @Info: 赋值一个图形
+   @Type: Method
+   @Params:
+   - el {Instance} 图形实例
+   @Return: 图形实例
+   */
   clone: function(el){
     var self = this,
       tem = null,
@@ -1007,6 +1017,9 @@ Paper.include({
     tem.zIndex = cf.zIndex;
     return tem;
   },
+  refresh: function(){
+    this.render();
+  },
   /*!Private
 
       清空画布 重绘一帧
@@ -1015,10 +1028,6 @@ Paper.include({
       检查是否有该点
 
    */
-  //TODO: whoHasThisPoint方法不应该触发实际绘制 所以应该和render拆分开
-  refresh: function(){
-    this.render();
-  },
   render: function(check){
     var self = this,
       allElements = self.allElements,
@@ -1055,7 +1064,7 @@ Paper.include({
   whoHasThisPoint: function(p){
     var self = this,
       ctx = self.canvasContext,
-      which = [];
+      which;
     ctx.save();
     which = self.render(p);
     ctx.restore();
@@ -1063,8 +1072,13 @@ Paper.include({
   }
 });
 
-var Matrix, Cgroup, Celement,
-    Crect, Carc, Cellipse, Cpath,
+var Matrix,
+    Cgroup,
+    Celement,
+    Crect,
+    Carc,
+    Cellipse,
+    Cpath,
     regodr = /[MLQCZHV]/gi,
     regodr_lower = /[mlqc]/g;
 
@@ -1141,7 +1155,6 @@ Matrix.include({
   }
 });
 
-//Todo: group在循环组内元素时，每改动一个元素都会触发一次重绘，需要结合重绘调用的配置进行优化
 //Todo: 单独给一个成员绑事件，只触发该成员事件，给group绑事件则全员触发???
 Cgroup = new Class;
 Cgroup.include({
@@ -1375,33 +1388,33 @@ Cpath.extend({
       if(arr.length !== 0){
         last_points = arr[arr.length-1].points;
         len = last_points.length;
-        lastX = last_points[len-2]*1;
-        lastY = last_points[len-1]*1;
+        lastX = +last_points[len-2];
+        lastY = +last_points[len-1];
       }
       if(type.search(regodr_lower) !== -1){
-        points[0] = points[0]*1 + lastX;
-        points[1] = points[1]*1 + lastY;
+        points[0] = +points[0] + lastX;
+        points[1] = +points[1] + lastY;
         if(points.length > 2){
-          points[2] = points[2]*1 + lastX;
-          points[3] = points[3]*1 + lastY;
+          points[2] = +points[2] + lastX;
+          points[3] = +points[3] + lastY;
         }
         if(points.length > 4){
-          points[4] = points[4]*1 + lastX;
-          points[5] = points[5]*1 + lastY;
+          points[4] = +points[4] + lastX;
+          points[5] = +points[5] + lastY;
         }
         type = type.toUpperCase();
       }
       if(type == 'H' || type == 'h'){
         points[1] = lastY;
         if(type == 'h'){
-          points[0] = points[0]*1 + lastX;
+          points[0] = +points[0] + lastX;
         }
         type = 'L';
       }
       if(type == 'V' || type == 'v'){
         points[1] = points[0];
         if(type == 'v'){
-          points[1] = points[1]*1 + lastY;
+          points[1] = +points[1] + lastY;
         }
         points[0] = lastX;
         type = 'L';
