@@ -120,25 +120,29 @@ function extend(){
   ***
 
   @Usage:
-    //创建父类
-    Dad = new Class;
-    Dad.extend({
-      say: function(){...}  //类方法
-    });
-    Dad.include({
-      init: function(){...} //init方法会在创建实例时自动调用
-      look: function(){...} //原型方法
-    });
-
-    //创建子类，子类继承父类
-    Son = new Class(Dad);
-    Son.inlcude({
-      look: function(){ //覆盖父类的方法
-        this._super();  //调用父类的同名方法 和其他语言的super功能相似
-        ...
-      }
-    });
-    tom = new Son;  //创建实例
+  |  //创建父类
+  |  Dad = new Class;
+  |
+  |  Dad.extend({
+  |    say: function(){...}  //类方法
+  |  });
+  |
+  |  Dad.include({
+  |    init: function(){...} //init方法会在创建实例时自动调用
+  |    look: function(){...} //原型方法
+  |  });
+  |
+  |  //创建子类，子类继承父类
+  |  Son = new Class(Dad);
+  |
+  |  Son.inlcude({
+  |    look: function(){ //覆盖父类的方法
+  |      this._super();  //调用父类的同名方法 和其他语言的super功能相似
+  |      ...
+  |    }
+  |  });
+  |
+  |  tom = new Son;  //创建实例
 
 */
 var Class = function(parent){
@@ -279,8 +283,8 @@ function rgb2hex(r, g, b) {
     @Return:
     - {instance} Paper对象的实例
     @Usage:
-      var paper = SI('div1', 100, 200);
-      paper.rect(...);
+    |  var paper = SI('div1', 100, 200);
+    |  paper.rect(...);
   */
   SI = function(id, w, h, t, l){
     return new SI.Paper(id, w, h, t, l);
@@ -954,25 +958,25 @@ Paper.include({
    - {JSON or String} 描述路径的json或者string，如果是string，会由内置的parse转换成json
    @return: path实例
    @Usage:
-
-   pathString = "Mx,yLx,y..."
-
-   pathJSON = [
-    {type:'moveTo', points: [x, y]},
-    {type:'lineTo', points: [x, y]},
-    {type:'quadraticCurveTo', points: [x1, y1, x2, y2]},
-    {type:'bezierCurveTo', points: [x1, y1, x2, y2, x3, y3]}
-    {type:'closePath'},
-    {type:'moveTo', points: [x, y]},
-    ...
-   ];
-
-   paper.path(pathString);
-
-   //or
-
-   paper.path(pathJSON);
-
+   | 
+   |  pathString = "Mx,yLx,y..."
+   |
+   |  pathJSON = [
+   |    {type:'moveTo', points: [x, y]},
+   |    {type:'lineTo', points: [x, y]},
+   |    {type:'quadraticCurveTo', points: [x1, y1, x2, y2]},
+   |    {type:'bezierCurveTo', points: [x1, y1, x2, y2, x3, y3]}
+   |    {type:'closePath'},
+   |    {type:'moveTo', points: [x, y]},
+   |    ...
+   |  ];
+   |
+   |  paper.path(pathString);
+   |
+   |  //or
+   |
+   |  paper.path(pathJSON);
+   |
    */
   path: function(json){
     var self = this,
@@ -1466,8 +1470,8 @@ SI.getEventPosition = getEventPosition;
   @Return:
   - {array}
   @Usage:
-  arr = SI.parsePath('M10,10L10,10C-10-10...');
-  //arr = [{type:'moveTo',points:[10,10]}, {type:'lineTo',points:[10,10]}...]
+  | arr = SI.parsePath('M10,10L10,10C-10-10...');
+  | //arr => [{type:'moveTo',points:[10,10]}, {type:'lineTo',points:[10,10]}...]
 
 */
 SI.parsePath = Cpath.parse;

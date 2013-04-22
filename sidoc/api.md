@@ -8,10 +8,9 @@
 
 @License: Released under the MIT license
 
-
 ===
 
-@Name: Class
+###Class
 
 @Info: OOP封装
 
@@ -22,10 +21,9 @@
 - parent {constructor} 父类（可选）
 
 @Return: {Class}
-
 ***
 
-@Name: Class.extend
+###Class.extend
 
 @Info: 给类增加方法
 
@@ -34,10 +32,9 @@
 @Params:
 
 - {object} 对象内部的属性方法都会追加到类上
-
 ***
 
-@Name: Class.include
+###Class.include
 
 @Info: 给原型增加方法
 
@@ -46,51 +43,38 @@
 @Params:
 
 - {object} 对象内部的属性都会追加到圆形上，供实例使用
-
 ***
 
 @Usage:
 
-//创建父类
+```
+  //创建父类
+  Dad = new Class;
 
-Dad = new Class;
+  Dad.extend({
+    say: function(){...}  //类方法
+  });
 
-Dad.extend({
+  Dad.include({
+    init: function(){...} //init方法会在创建实例时自动调用
+    look: function(){...} //原型方法
+  });
 
-say: function(){...}  //类方法
+  //创建子类，子类继承父类
+  Son = new Class(Dad);
 
-});
+  Son.inlcude({
+    look: function(){ //覆盖父类的方法
+      this._super();  //调用父类的同名方法 和其他语言的super功能相似
+      ...
+    }
+  });
 
-Dad.include({
-
-init: function(){...} //init方法会在创建实例时自动调用
-
-look: function(){...} //原型方法
-
-});
-
-//创建子类，子类继承父类
-
-Son = new Class(Dad);
-
-Son.inlcude({
-
-look: function(){ //覆盖父类的方法
-
-this._super();  //调用父类的同名方法 和其他语言的super功能相似
-
-...
-
-}
-
-});
-
-tom = new Son;  //创建实例
-
-
+  tom = new Son;  //创建实例
+```
 ===
 
-@Name: SI
+###SI
 
 @Info: Sivona.js的命名空间，以及新画布的构造函数
 
@@ -114,23 +98,21 @@ tom = new Son;  //创建实例
 
 @Usage:
 
-var paper = SI('div1', 100, 200);
-
-paper.rect(...);
-
-
+```
+  var paper = SI('div1', 100, 200);
+  paper.rect(...);
+```
 ===
 
-@Name: Paper
+###Paper
 
 @Type: Class
 
 @Info: 画布类，实例拥有各种绘图方法 一般通过SI方法new出实例
 
-
 ===
 
-@Name: paper.group()
+###paper.group()
 
 @Info: 创建图形组
 
@@ -142,10 +124,9 @@ paper.rect(...);
 
 - 实例对象
 
-
 ===
 
-@Name: paper.text(t, x, y, w)
+###paper.text(t, x, y, w)
 
 @Info: 绘制文字的方法
 
@@ -163,10 +144,9 @@ paper.rect(...);
 
 - 实例对象
 
-
 ===
 
-@Name: paper.rect(x, y, w, h)
+###paper.rect(x, y, w, h)
 
 @Info: 绘制矩形的方法
 
@@ -184,10 +164,9 @@ paper.rect(...);
 
 - 实例对象
 
-
 ===
 
-@Name: paper.arc(x, y, r, sAngle, eAngle, counterclockwise)
+###paper.arc(x, y, r, sAngle, eAngle, counterclockwise)
 
 @Info: 绘制弧形的方法
 
@@ -209,10 +188,9 @@ paper.rect(...);
 
 - 实例对象
 
-
 ===
 
-@Name: paper.circle(x, y, r)
+###paper.circle(x, y, r)
 
 @Info: 绘制圆形的方法
 
@@ -228,10 +206,9 @@ paper.rect(...);
 
 - 实例对象
 
-
 ===
 
-@Name: paper.ellipse(x, y, xr, yr)
+###paper.ellipse(x, y, xr, yr)
 
 @Info: 绘制椭圆形的方法
 
@@ -249,10 +226,9 @@ paper.rect(...);
 
 - 实例对象
 
-
 ===
 
-@Name: path
+###path
 
 @Info: 路径方法
 
@@ -266,36 +242,30 @@ paper.rect(...);
 
 @Usage:
 
-pathString = "Mx,yLx,y..."
+```
+ 
+  pathString = "Mx,yLx,y..."
 
-pathJSON = [
+  pathJSON = [
+    {type:'moveTo', points: [x, y]},
+    {type:'lineTo', points: [x, y]},
+    {type:'quadraticCurveTo', points: [x1, y1, x2, y2]},
+    {type:'bezierCurveTo', points: [x1, y1, x2, y2, x3, y3]}
+    {type:'closePath'},
+    {type:'moveTo', points: [x, y]},
+    ...
+  ];
 
-{type:'moveTo', points: [x, y]},
+  paper.path(pathString);
 
-{type:'lineTo', points: [x, y]},
+  //or
 
-{type:'quadraticCurveTo', points: [x1, y1, x2, y2]},
+  paper.path(pathJSON);
 
-{type:'bezierCurveTo', points: [x1, y1, x2, y2, x3, y3]}
-
-{type:'closePath'},
-
-{type:'moveTo', points: [x, y]},
-
-...
-
-];
-
-paper.path(pathString);
-
-//or
-
-paper.path(pathJSON);
-
-
+```
 ===
 
-@Name: clone
+###clone
 
 @Info: 赋值一个图形
 
@@ -307,15 +277,13 @@ paper.path(pathJSON);
 
 @Return: 图形实例
 
-
 ===
 
 @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
 
-
 ===
 
-@Name: SI.parsePath(d)
+###SI.parsePath(d)
 
 @Info: 解析SVG路径描述，转为Canvas绘制用的命令和点的数组
 
@@ -329,8 +297,7 @@ paper.path(pathJSON);
 
 @Usage:
 
-arr = SI.parsePath('M10,10L10,10C-10-10...');
-
-//arr = [{type:'moveTo',points:[10,10]}, {type:'lineTo',points:[10,10]}...]
-
-
+```
+ arr = SI.parsePath('M10,10L10,10C-10-10...');
+ //arr => [{type:'moveTo',points:[10,10]}, {type:'lineTo',points:[10,10]}...]
+```
