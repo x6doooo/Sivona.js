@@ -82,7 +82,7 @@ function extend(){
   return target;
 }
 
-/*!
+/*!Private
   @Name: Class
   @Info: OOP封装
   @Type: Class

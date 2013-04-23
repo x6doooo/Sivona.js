@@ -18,7 +18,19 @@ var Matrix,
  */
 
 Matrix = new Class;
+
 Matrix.extend({
+  /*!
+   @Name: Matrix.p2p(point, matrix)
+   @Info: Matrix的类方法，计算一个点经过一个矩阵变换后的坐标
+   @Params:
+   -point {Array} [x, y] 点坐标
+   -m {Array} [a,b,c,d,e,f]
+   @Usage:
+   |  p = [10, 10];
+   |  matrix = [1, 0, 0 , 1, 10, 10]
+   |  Matrix.p2p(p, matrix) // => [20, 20]
+   */
   p2p: function(p, m){
     var x = p[0],
       y = p[1];
@@ -32,6 +44,10 @@ Matrix.include({
   init: function(){
     this.matrix = [1, 0, 0, 1, 0, 0];
   },
+  /*!Private
+   @Name: el.update()
+   @Info: 根据参数更新矩阵
+   */
   update: function(a, b, c, d, e, f){
     var self = this,
       m = self.matrix,
@@ -40,8 +56,7 @@ Matrix.include({
       m2 = m[2],
       m3 = m[3],
       m4 = m[4],
-      m5 = m[5],
-      m6 = m[6];
+      m5 = m[5];
     self.matrix = [
       m0 * a + m2 * b,
       m1 * a + m3 * b,
@@ -54,6 +69,10 @@ Matrix.include({
   resetContextMatrix: function(){
     this.context.setTransform(1, 0, 0, 1, 0, 0);
   },
+  /*!
+    @Name: el.translate(x, y)
+    @Info: 平移
+   */
   translate: function(x, y){
     this.update(1, 0, 0, 1, x, y);
     return this;
@@ -82,12 +101,14 @@ Matrix.include({
 });
 
 //Todo: 单独给一个成员绑事件，只触发该成员事件，给group绑事件则全员触发???
+//TODO：点击事件比较好处理 因为group绑定点击后，点击某个组成部分就会触发事件
+//TODO：不好处理的是drag事件，当拖动一个组成部分时，其他部分应该也一起移动才对！！！
 Cgroup = new Class;
 Cgroup.include({
   init: function(arr){
-    var self = this;
-    self.els = arr,
+    var self = this,
       methods = ['show', 'hide', 'attr'];
+    self.els = arr;
     methods.forEach(function(v){
       self[v] = function(){
         var els = self.els,
@@ -107,7 +128,7 @@ Cgroup.include({
   }
 });
 
-/*!
+/*!Private
  @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
  */
 Celement = new Class(Matrix);
@@ -117,7 +138,7 @@ Celement.include({
     self._super();
     forEach(arguments[0], function(v, k){
       self[k] = v;
-    })
+    });
     self.display = true;
     self.income = false;
     self.closeit = true;
@@ -136,6 +157,18 @@ Celement.include({
     }
     self.income = b;
   },
+
+  /*!
+    @Name: el.data(key[, value])
+    @Type: Method
+    @Info: 图形对象绑定、读取数据的方法
+    @Usage:
+    | rect = paper.rect(10, 10, 100, 80);
+    | //绑定
+    | rect.data('key', 'value');
+    | //读取
+    | rect.data('key');
+   */
   data: function(k, v){
     var self = this;
     if(isDefined(v)){
@@ -144,6 +177,19 @@ Celement.include({
     }
     return self.data[k];
   },
+
+  /*!
+    @Name: el.attr(...)
+    @Type: Method
+    @Info: 给图形设置样式或读取样式的方法
+    @Usage:
+    | //给图形对象设置填充色
+    | el.attr('fillStyle', '#333');
+    | //设置多个样式字段，可以使用一个hash参数
+    | el.attr({'fillStyle':'red', 'lineWidth': 10});
+    | //读取一个样式字段的值
+    | el.attr('strokeStyle');
+   */
   attr: function(){
     var self = this,
       args = to_a(arguments),
@@ -165,9 +211,17 @@ Celement.include({
     }
     return self;
   },
+  /*!
+    @Name: el.show()
+    @Info: 显示图形
+   */
   show: function(){
     this.display = true;
   },
+  /*!
+    @Name: el.hide()
+    @Info: 隐藏图形
+   */
   hide: function(){
     var self = this,
       paper = self.paper,
@@ -188,6 +242,7 @@ Celement.include({
       cfg = self.cfg,
       ctx = self.context,
       mtx = self.matrix;
+
     if(self.display === false) return;
     forEach(cfg, function(v, k){
       ctx[k] = v;
@@ -211,9 +266,29 @@ Celement.include({
       ctx.fill();
     }
   },
-  animate: function(/* obj, num, func */){
+  /*!
+   @Name: el.animate(options[, time, callback])
+   @Info: 给图形设置动画
+   @Params:
+   - options {Object} 动画内容
+   - time {Number} 可选 毫秒数 动画过程时间
+   - callback {Function} 可选 回调函数
+   @Usage:
+   |  el.animate({
+   |    "fillStyle": "#f00",
+   |    "lineWidth": "#333"
+   |  }, 500, function(){
+   |    alert("done!");  
+   |  });
+   */
+  animate: function(){
     return sanimator.add(this, arguments);
   },
+  /*!
+   @Name: el.remove()
+   @Type: Method
+   @Info: 删除图形
+   */
   remove: function(){
     var self = this;
     self.hide();
@@ -266,10 +341,10 @@ Cellipse.include({
     var self = this,
       ctx = self.context,
       kappa = 0.5522848,
-      x = self.x - self.xr,
-      y = self.y - self.yr,
       xr = self.xr,
       yr = self.yr,
+      x = self.x - xr,
+      y = self.y - yr,
       ox = xr * kappa,
       oy = yr * kappa,
       xe = x + xr * 2,

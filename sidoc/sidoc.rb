@@ -26,18 +26,19 @@ class File_maker
   attr_accessor :content, :api_doc
   def format_api_doc
     isUsage = false
+    #取出公共api的注释（不包含private）
     @api_doc = @content.scan(/\/\*![^Private][^*]*\*+(?:[^*\/][^*]*\*+)*\//)
     @api_doc.map!{|line|
-      line = line.gsub(/^\s+|^\t+/, "")
-        .gsub(/(^[@-])/, "\n\\1")
-        .gsub(/\/\*\!/, "===")
-        .gsub(/\*\//, "\n")
-        .gsub(/@Title:\s*/, "#")
-        .gsub(/(@Link\:\s*)(.+$)/, '\\1<\\2>')
-        .gsub(/@Name:\s*/, "###")
-        .gsub(/(@Usage:.*\n)/, "\\1\n```\n")
-        .gsub(/(^\|.*\n*)(^[^\|])/, "\\1```\\2")
-        .gsub(/^\|/, '')
+      line.gsub(/^\s+|^\t+/, "")  #删除行首和行尾的控制、制表符
+        .gsub(/(^[@-])/, "\n\\1") #普通行增加换行（markdown里两个换行才能正常换行）
+        .gsub(/\/\*\!/, "===")    #每个注释段落前面增加分隔线
+        .gsub(/\*\//, "\n")       #注释段落最后增加换行
+        .gsub(/@Title:\s*/, "#")  #整个文档的标题
+        .gsub(/(@Link\:\s*)(.+$)/, '\\1<\\2>')  #链接
+        .gsub(/@Name:\s*/, "###") #api名称
+        .gsub(/(@Usage:.*\n)/, "\\1\n```\n")  #用例
+        .gsub(/(^\|.*\n*)(^[^\|])/, "\\1```\\2")  #用例用```括起来
+        .gsub(/^\|/, '')  #去掉用例每行前面的的|
     }
     @api_doc = @api_doc.join
   end

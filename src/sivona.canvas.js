@@ -151,9 +151,21 @@ Paper.include({
       ctx[k] = v;
     });
   },
-  /*!Private
-      @Name: paper.clear
+  /*!
+      @Name: paper.clear([l, t, w, h])
       @Info: 清空画布
+      @Params:
+      - l {Number} 清空区域的左上角x坐标
+      - t {Number} 清空区域的左上角y坐标
+      - w {Number} 清空区域的宽度
+      - h {Number} 清空区域的高度
+      - 无参数时清空整个画布
+      @Usage:
+      | //从（10,10）坐标开始清空100*100的区域
+      | paper.clear(10, 10, 100, 100)
+      |
+      | //清空整个画布
+      | paper.clear()
    */
   clear: function(l, t, w, h){
     var self = this,
@@ -179,7 +191,7 @@ Paper.include({
     el.paper = self;
     el.context = self.canvasContext;
     el.zIndex = els.length;
-    /*
+    /*!Private
         绑定事件
      */
     while(len--){
@@ -206,12 +218,12 @@ Paper.include({
     return el;
   },
   /*!
-      @Name: paper.group()
+      @Name: paper.group(el, el, el, ...)
       @Info: 创建图形组
       @Params:
-      - {Instance} 图形实例
+      - {Instance} 若干图形实例
       @Return:
-      - 实例对象
+      - group实例对象
    */
   group: function(){
     var self = this,
@@ -230,7 +242,7 @@ Paper.include({
       - y {Number} y轴坐标
       - w {Number} 文字宽度（可选）
       @Return:
-      - 实例对象
+      - 文字实例对象
    */
   text: function(t, x, y, w){
     var self = this,
@@ -252,7 +264,7 @@ Paper.include({
       - w {Number} 宽
       - h {Number} 高
       @Return:
-      - 实例对象
+      - 矩形实例对象
    */
   rect: function(x, y, w, h){
     var self = this,
@@ -276,7 +288,7 @@ Paper.include({
    - eAngle {Number} 结束角度
    - counterclockwise {Boolen} 顺时针画还是逆时针画
    @Return:
-   - 实例对象
+   - 弧形实例对象
    */
   arc: function(x, y, r, sAngle, eAngle, counterclockwise){
     var self = this,
@@ -299,7 +311,7 @@ Paper.include({
    - y {Number} 圆心y轴坐标
    - r {Number} 半径
    @Return:
-   - 实例对象
+   - 圆形实例对象
    */
   circle: function(x, y, r){
     var self = this,
@@ -323,7 +335,7 @@ Paper.include({
    - xr {Number} x轴半径
    - yr {Number} y轴半径
    @Return:
-   - 实例对象
+   - 椭圆实例对象
    */
   ellipse: function(x, y, xr, yr){
     var self = this,
@@ -334,7 +346,7 @@ Paper.include({
     return self.initShape(el);
   },
   /*!
-   @Name: paper.path
+   @Name: paper.path(...)
    @Info: 路径方法
    @Type: Method
    @Params:
@@ -372,8 +384,8 @@ Paper.include({
     return self.initShape(el);
   },
   /*!
-   @Name: clone
-   @Info: 赋值一个图形
+   @Name: paper.clone(el)
+   @Info: 复制一个图形
    @Type: Method
    @Params:
    - el {Instance} 图形实例
