@@ -91,7 +91,7 @@ function extend(){
   return target;
 }
 
-/*!
+/*!Private
   @Name: Class
   @Info: OOP封装
   @Type: Class
@@ -405,17 +405,25 @@ function getEventPosition(ev){
       clearTimeout(id);
     };
   }
-}());
+})();
+
+/*!Private
+
+  @Name: Animator
+  @Type: Class
+  @Info: 动画控制器。SI.animationController是它的一个实例，该实例可以控制由shape.animate()生成的动画。
+
+ */
 
 var Animator = new Class;
 Animator.include({
-  init: function(){
+  init: function() {
     this.amtArr = [];
     this.stamp = null;
     this.timer = null;
     this.timeDiff = 1;
   },
-  add: function(el, arr){
+  add: function(el, arr) {
     var self = this,
       amtArr = self.amtArr,
       oldStatus = amtArr.length,
@@ -423,7 +431,7 @@ Animator.include({
       hl = arr[1]||500,
       cfg = el.cfg,
       am = extend(true, {}, arr[0]),
-      cb = arr[2] || function(){},
+      cb = arr[2] || function() {},
       k,
       v;
 
@@ -768,9 +776,20 @@ Paper.include({
       ctx[k] = v;
     });
   },
-  /*!Private
-      @Name: paper.clear
+  /*!
+      @Name: paper.clear([l, t, w, h])
       @Info: 清空画布
+      @Params:
+      - l {Number} 清空区域的左上角x坐标
+      - t {Number} 清空区域的左上角y坐标
+      - w {Number} 清空区域的宽度
+      - h {Number} 清空区域的高度
+      @Usage:
+      | //从（10,10）坐标开始清空100*100的区域
+      | paper.clear(10, 10, 100, 100)
+      |
+      | //清空整个画布
+      | paper.clear()
    */
   clear: function(l, t, w, h){
     var self = this,
@@ -796,7 +815,7 @@ Paper.include({
     el.paper = self;
     el.context = self.canvasContext;
     el.zIndex = els.length;
-    /*
+    /*!Private
         绑定事件
      */
     while(len--){
@@ -823,12 +842,12 @@ Paper.include({
     return el;
   },
   /*!
-      @Name: paper.group()
+      @Name: paper.group(el, el, el, ...)
       @Info: 创建图形组
       @Params:
-      - {Instance} 图形实例
+      - {Instance} 若干图形实例
       @Return:
-      - 实例对象
+      - group实例对象
    */
   group: function(){
     var self = this,
@@ -847,7 +866,7 @@ Paper.include({
       - y {Number} y轴坐标
       - w {Number} 文字宽度（可选）
       @Return:
-      - 实例对象
+      - 文字实例对象
    */
   text: function(t, x, y, w){
     var self = this,
@@ -869,7 +888,7 @@ Paper.include({
       - w {Number} 宽
       - h {Number} 高
       @Return:
-      - 实例对象
+      - 矩形实例对象
    */
   rect: function(x, y, w, h){
     var self = this,
@@ -893,7 +912,7 @@ Paper.include({
    - eAngle {Number} 结束角度
    - counterclockwise {Boolen} 顺时针画还是逆时针画
    @Return:
-   - 实例对象
+   - 弧形实例对象
    */
   arc: function(x, y, r, sAngle, eAngle, counterclockwise){
     var self = this,
@@ -916,7 +935,7 @@ Paper.include({
    - y {Number} 圆心y轴坐标
    - r {Number} 半径
    @Return:
-   - 实例对象
+   - 圆形实例对象
    */
   circle: function(x, y, r){
     var self = this,
@@ -940,7 +959,7 @@ Paper.include({
    - xr {Number} x轴半径
    - yr {Number} y轴半径
    @Return:
-   - 实例对象
+   - 椭圆实例对象
    */
   ellipse: function(x, y, xr, yr){
     var self = this,
@@ -951,7 +970,7 @@ Paper.include({
     return self.initShape(el);
   },
   /*!
-   @Name: path
+   @Name: paper.path(...)
    @Info: 路径方法
    @Type: Method
    @Params:
@@ -989,8 +1008,8 @@ Paper.include({
     return self.initShape(el);
   },
   /*!
-   @Name: clone
-   @Info: 赋值一个图形
+   @Name: paper.clone(el)
+   @Info: 复制一个图形
    @Type: Method
    @Params:
    - el {Instance} 图形实例
@@ -1096,7 +1115,19 @@ var Matrix,
  */
 
 Matrix = new Class;
+
 Matrix.extend({
+  /*!
+   @Name: Matrix.p2p(point, matrix)
+   @Info: Matrix的类方法，计算一个点经过一个矩阵变换后的坐标
+   @Params:
+   -point {Array} [x, y] 点坐标
+   -m {Array} [a,b,c,d,e,f]
+   @Usage:
+   |  p = [10, 10];
+   |  matrix = [1, 0, 0 , 1, 10, 10]
+   |  Matrix.p2p(p, matrix) // => [20, 20]
+   */
   p2p: function(p, m){
     var x = p[0],
       y = p[1];
@@ -1110,6 +1141,10 @@ Matrix.include({
   init: function(){
     this.matrix = [1, 0, 0, 1, 0, 0];
   },
+  /*!Private
+   @Name: el.update()
+   @Info: 根据参数更新矩阵
+   */
   update: function(a, b, c, d, e, f){
     var self = this,
       m = self.matrix,
@@ -1132,6 +1167,10 @@ Matrix.include({
   resetContextMatrix: function(){
     this.context.setTransform(1, 0, 0, 1, 0, 0);
   },
+  /*!
+    @Name: el.translate(x, y)
+    @Info: 平移
+   */
   translate: function(x, y){
     this.update(1, 0, 0, 1, x, y);
     return this;
@@ -1160,12 +1199,14 @@ Matrix.include({
 });
 
 //Todo: 单独给一个成员绑事件，只触发该成员事件，给group绑事件则全员触发???
+//TODO：点击事件比较好处理 因为group绑定点击后，点击某个组成部分就会触发事件
+//TODO：不好处理的是drag事件，当拖动一个组成部分时，其他部分应该也一起移动才对！！！
 Cgroup = new Class;
 Cgroup.include({
   init: function(arr){
-    var self = this;
-    self.els = arr,
+    var self = this,
       methods = ['show', 'hide', 'attr'];
+    self.els = arr;
     methods.forEach(function(v){
       self[v] = function(){
         var els = self.els,
@@ -1185,7 +1226,7 @@ Cgroup.include({
   }
 });
 
-/*!
+/*!Private
  @Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
  */
 Celement = new Class(Matrix);
@@ -1195,7 +1236,7 @@ Celement.include({
     self._super();
     forEach(arguments[0], function(v, k){
       self[k] = v;
-    })
+    });
     self.display = true;
     self.income = false;
     self.closeit = true;
@@ -1214,6 +1255,18 @@ Celement.include({
     }
     self.income = b;
   },
+
+  /*!
+    @Name: el.data(key[, value])
+    @Type: Method
+    @Info: 图形对象绑定、读取数据的方法
+    @Usage:
+    | rect = paper.rect(10, 10, 100, 80);
+    | //绑定
+    | rect.data('key', 'value');
+    | //读取
+    | rect.data('key');
+   */
   data: function(k, v){
     var self = this;
     if(isDefined(v)){
@@ -1222,6 +1275,19 @@ Celement.include({
     }
     return self.data[k];
   },
+
+  /*!
+    @Name: el.attr(...)
+    @Type: Method
+    @Info: 给图形设置样式或读取样式的方法
+    @Usage:
+    | //给图形对象设置填充色
+    | el.attr('fillStyle', '#333');
+    | //设置多个样式字段，可以使用一个hash参数
+    | el.attr({'fillStyle':'red', 'lineWidth': 10});
+    | //读取一个样式字段的值
+    | el.attr('strokeStyle');
+   */
   attr: function(){
     var self = this,
       args = to_a(arguments),
@@ -1243,9 +1309,17 @@ Celement.include({
     }
     return self;
   },
+  /*!
+    @Name: el.show()
+    @Info: 显示图形
+   */
   show: function(){
     this.display = true;
   },
+  /*!
+    @Name: el.hide()
+    @Info: 隐藏图形
+   */
   hide: function(){
     var self = this,
       paper = self.paper,
@@ -1266,6 +1340,7 @@ Celement.include({
       cfg = self.cfg,
       ctx = self.context,
       mtx = self.matrix;
+
     if(self.display === false) return;
     forEach(cfg, function(v, k){
       ctx[k] = v;
@@ -1289,9 +1364,29 @@ Celement.include({
       ctx.fill();
     }
   },
-  animate: function(/* obj, num, func */){
+  /*!
+   @Name: el.animate(options[, time, callback])
+   @Info: 给图形设置动画
+   @Params:
+   - options {Object} 动画内容
+   - time {Number} 可选 毫秒数 动画过程时间
+   - callback {Function} 可选 回调函数
+   @Usage:
+   |  el.animate({
+   |    "fillStyle": "#f00",
+   |    "lineWidth": "#333"
+   |  }, 500, function(){
+   |    alert("done!");  
+   |  });
+   */
+  animate: function(){
     return sanimator.add(this, arguments);
   },
+  /*!
+   @Name: el.remove()
+   @Type: Method
+   @Info: 删除图形
+   */
   remove: function(){
     var self = this;
     self.hide();
@@ -1344,10 +1439,10 @@ Cellipse.include({
     var self = this,
       ctx = self.context,
       kappa = 0.5522848,
-      x = self.x - self.xr,
-      y = self.y - self.yr,
       xr = self.xr,
       yr = self.yr,
+      x = self.x - xr,
+      y = self.y - yr,
       ox = xr * kappa,
       oy = yr * kappa,
       xe = x + xr * 2,

@@ -10,70 +10,6 @@
 
 ===
 
-###Class
-
-@Info: OOP封装
-
-@Type: Class
-
-@Params:
-
-- parent {constructor} 父类（可选）
-
-@Return: {Class}
-***
-
-###Class.extend
-
-@Info: 给类增加方法
-
-@Type: Method
-
-@Params:
-
-- {object} 对象内部的属性方法都会追加到类上
-***
-
-###Class.include
-
-@Info: 给原型增加方法
-
-@Type: Method
-
-@Params:
-
-- {object} 对象内部的属性都会追加到圆形上，供实例使用
-***
-
-@Usage:
-
-```
-  //创建父类
-  Dad = new Class;
-
-  Dad.extend({
-    say: function(){...}  //类方法
-  });
-
-  Dad.include({
-    init: function(){...} //init方法会在创建实例时自动调用
-    look: function(){...} //原型方法
-  });
-
-  //创建子类，子类继承父类
-  Son = new Class(Dad);
-
-  Son.inlcude({
-    look: function(){ //覆盖父类的方法
-      this._super();  //调用父类的同名方法 和其他语言的super功能相似
-      ...
-    }
-  });
-
-  tom = new Son;  //创建实例
-```
-===
-
 ###SI
 
 @Info: Sivona.js的命名空间，以及新画布的构造函数
@@ -112,17 +48,42 @@
 
 ===
 
-###paper.group()
+###paper.clear([l, t, w, h])
+
+@Info: 清空画布
+
+@Params:
+
+- l {Number} 清空区域的左上角x坐标
+
+- t {Number} 清空区域的左上角y坐标
+
+- w {Number} 清空区域的宽度
+
+- h {Number} 清空区域的高度
+
+@Usage:
+
+```
+ //从（10,10）坐标开始清空100*100的区域
+ paper.clear(10, 10, 100, 100)
+
+ //清空整个画布
+ paper.clear()
+```
+===
+
+###paper.group(el, el, el, ...)
 
 @Info: 创建图形组
 
 @Params:
 
-- {Instance} 图形实例
+- {Instance} 若干图形实例
 
 @Return:
 
-- 实例对象
+- group实例对象
 
 ===
 
@@ -142,7 +103,7 @@
 
 @Return:
 
-- 实例对象
+- 文字实例对象
 
 ===
 
@@ -162,7 +123,7 @@
 
 @Return:
 
-- 实例对象
+- 矩形实例对象
 
 ===
 
@@ -186,7 +147,7 @@
 
 @Return:
 
-- 实例对象
+- 弧形实例对象
 
 ===
 
@@ -204,7 +165,7 @@
 
 @Return:
 
-- 实例对象
+- 圆形实例对象
 
 ===
 
@@ -224,11 +185,11 @@
 
 @Return:
 
-- 实例对象
+- 椭圆实例对象
 
 ===
 
-###path
+###paper.path(...)
 
 @Info: 路径方法
 
@@ -265,9 +226,9 @@
 ```
 ===
 
-###clone
+###paper.clone(el)
 
-@Info: 赋值一个图形
+@Info: 复制一个图形
 
 @Type: Method
 
@@ -279,7 +240,107 @@
 
 ===
 
-@Tip: matrix属性和attr属性必须区分开，避免matrix属性直接污染context
+###Matrix.p2p(point, matrix)
+
+@Info: Matrix的类方法，计算一个点经过一个矩阵变换后的坐标
+
+@Params:
+
+-point {Array} [x, y] 点坐标
+
+-m {Array} [a,b,c,d,e,f]
+
+@Usage:
+
+```
+  p = [10, 10];
+  matrix = [1, 0, 0 , 1, 10, 10]
+  Matrix.p2p(p, matrix) // => [20, 20]
+```
+===
+
+###el.translate(x, y)
+
+@Info: 平移
+
+===
+
+###el.data(key[, value])
+
+@Type: Method
+
+@Info: 图形对象绑定、读取数据的方法
+
+@Usage:
+
+```
+ rect = paper.rect(10, 10, 100, 80);
+ //绑定
+ rect.data('key', 'value');
+ //读取
+ rect.data('key');
+```
+===
+
+###el.attr(...)
+
+@Type: Method
+
+@Info: 给图形设置样式或读取样式的方法
+
+@Usage:
+
+```
+ //给图形对象设置填充色
+ el.attr('fillStyle', '#333');
+ //设置多个样式字段，可以使用一个hash参数
+ el.attr({'fillStyle':'red', 'lineWidth': 10});
+ //读取一个样式字段的值
+ el.attr('strokeStyle');
+```
+===
+
+###el.show()
+
+@Info: 显示图形
+
+===
+
+###el.hide()
+
+@Info: 隐藏图形
+
+===
+
+###el.animate(options[, time, callback])
+
+@Info: 给图形设置动画
+
+@Params:
+
+- options {Object} 动画内容
+
+- time {Number} 可选 毫秒数 动画过程时间
+
+- callback {Function} 可选 回调函数
+
+@Usage:
+
+```
+  el.animate({
+    "fillStyle": "#f00",
+    "lineWidth": "#333"
+  }, 500, function(){
+    alert("done!");  
+  });
+```
+===
+
+###el.remove()
+
+@Type: Method
+
+@Info: 删除图形
 
 ===
 
