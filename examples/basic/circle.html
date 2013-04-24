@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title> Sivona.js Examples </title>
+  <script type="text/javascript" src="../../src/sivona.js"></script>
+</head>
+<body id="paper">
+
+<script>
+
+	SI.onEvent = false;
+
+  var paper = SI('paper'),
+      PI = Math.PI,
+      cos = Math.cos,
+      sin = Math.sin,
+      num = 60,
+      per = 2 * PI / num,
+      centerX = 200,
+      centerY = 200,
+      bigRadius = 100,
+      middleRadius = 90,
+      smallRadius = 80,
+      style = {lineWidth: 0},
+      l, p;
+
+  function getPointPosition(rad, x, y, r){
+    return [
+      r * cos(rad) + x,
+      r * sin(rad) + y
+    ];
+  }
+
+	function newColor(){
+		var num = Math.random().toString(16),
+				color = num.substring(2, 8),
+				len = color.length;
+		if(len == 6){
+			return '#' + color;
+		}
+		color += num.substring(2, 8 - len);
+		return '#' + color;
+	}
+
+  function draw(n, r, offset){
+    per = 2 * PI / n;
+    while(n--){
+	    style.fillStyle = newColor();
+      p = getPointPosition(per * n + offset, centerX, centerY, r);
+      p = paper.circle(p[0], p[1], 2.5).attr(style);
+    }
+  }
+
+  num = [60, 50, 40];
+
+	o = 0;
+
+	update();
+
+	function update(){
+		SI.requestAnimationFrame(function(){
+			paper.allElements = [];
+			o += 0.01;
+			draw(num[0], bigRadius, o);
+			draw(num[1], middleRadius, o);
+			draw(num[2], smallRadius, o);
+			paper.render();
+			update();
+		});
+	}
+
+</script>
+
+</body>
+</html>
