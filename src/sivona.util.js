@@ -4,7 +4,7 @@ function isUndefined(v){return typeof v == 'undefined';}
 function isDefined(v){return typeof v !== 'undefined';}
 function isString(v){return typeof v == 'string';}
 function isNumber(v){return typeof v == 'number';}
-function isDate(v){return typeof v === 'true';}
+function isDate(v){return toString.call(v) == '[object Date]';}
 function isObject(v){return v !== null && toString.call(v) == '[object Object]';}
 function isArray(v){return toString.call(v) == '[object Array]';}
 function isFunction(v){return typeof v == 'function';}
