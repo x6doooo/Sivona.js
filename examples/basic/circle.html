@@ -16,13 +16,14 @@
       sin = Math.sin,
       num = 60,
       per = 2 * PI / num,
+			w = paper.width - 100,
       centerX = 200,
       centerY = 200,
       bigRadius = 100,
       middleRadius = 90,
       smallRadius = 80,
       style = {lineWidth: 0},
-      l, p;
+      l, p, move = 2, o = 0, omove = 0.01;
 
   function getPointPosition(rad, x, y, r){
     return [
@@ -53,14 +54,18 @@
 
   num = [60, 50, 40];
 
-	o = 0;
-
 	update();
 
 	function update(){
 		SI.requestAnimationFrame(function(){
 			paper.allElements = [];
-			o += 0.01;
+			if(centerX <= 100 || centerX >= w){
+				move = -move;
+				omove = -omove;
+			}
+
+			centerX += move;
+			o += omove;
 			draw(num[0], bigRadius, o);
 			draw(num[1], middleRadius, o);
 			draw(num[2], smallRadius, o);
