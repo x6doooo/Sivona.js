@@ -3,17 +3,7 @@
     @Type: Class
     @Info: 画布类，实例拥有各种绘图方法 一般通过SI方法new出实例
  */
-var Paper,
-//TODO: T\S命令
-  order2func = {
-    'M': 'moveTo',
-    'L': 'lineTo',
-    'Q': 'quadraticCurveTo',
-    'C': 'bezierCurveTo',
-    'Z': 'closePath'
-  };
-
-Paper = new Class;
+var Paper = new Class;
 Paper.include({
   init: function(container_id, w, h, t, l){
     var self = this,
@@ -470,4 +460,3 @@ Paper.include({
     return which;
   }
 });
-

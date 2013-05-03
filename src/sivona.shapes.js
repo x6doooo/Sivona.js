@@ -5,9 +5,17 @@ var Matrix,
     Carc,
     Cellipse,
     Cpath,
-    regodr = /[MLQCZHV]/gi,
-    regodr_lower = /[mlqc]/g;
-
+    regodr = /[MLQCZHVTS]/gi,
+    regodr_lower = /[mlqc]/g,
+    order2func = {
+      'M': 'moveTo',
+      'L': 'lineTo',
+      'Q': 'quadraticCurveTo',
+      'C': 'bezierCurveTo',
+      'Z': 'closePath',
+      'T': 'quadraticCurveTo',
+      'S': 'bezierCurveTo'
+    };
 /*!Private
 
  @Name: Matrix
@@ -100,9 +108,11 @@ Matrix.include({
   }
 });
 
-//Todo: 单独给一个成员绑事件，只触发该成员事件，给group绑事件则全员触发???
-//TODO：点击事件比较好处理 因为group绑定点击后，点击某个组成部分就会触发事件
-//TODO：不好处理的是drag事件，当拖动一个组成部分时，其他部分应该也一起移动才对！！！
+/*!Private
+  单独给一个成员绑事件，只触发该成员事件，给group绑事件则全员触发???
+  点击事件比较好处理 因为group绑定点击后，点击某个组成部分就会触发事件
+  不好处理的是drag事件，当拖动一个组成部分时，其他部分应该也一起移动才对！！！
+*/
 Cgroup = new Class;
 Cgroup.include({
   init: function(arr){
@@ -299,7 +309,7 @@ Celement.include({
       if(v[0] == self) a.splice(i, 1);
     });
     domEvents.forEach(function(event){
-      self['un'+event]();
+      self['un' + event]();
     });
   }
 });
@@ -315,6 +325,13 @@ Ctext.include({
     if(self.cfg.lineWidth != 0){
       ctx.strokeText(txt, self.x, self.y, w);
     }
+  }
+});
+
+Cimage = new Class(Celement);
+Cimage.include({
+  draw: function(){
+    //TODO
   }
 });
 
@@ -377,7 +394,7 @@ Cpath.extend({
       l = str.length,
       v;
 
-    for(;i < l; i++){
+    for( ;i < l; i++){
       v = str[i];
       if(v == '') continue;
       type = v.match(regodr)[0];
@@ -406,19 +423,36 @@ Cpath.extend({
         type = type.toUpperCase();
       }
       if(type == 'H' || type == 'h'){
-        points[1] = lastY;
+        points.push(lastY);
         if(type == 'h'){
           points[0] = +points[0] + lastX;
         }
         type = 'L';
       }
       if(type == 'V' || type == 'v'){
-        points[1] = points[0];
+        points.unshift(lastX);
         if(type == 'v'){
           points[1] = +points[1] + lastY;
         }
-        points[0] = lastX;
         type = 'L';
+      }
+      if(type == 'T'){
+        if(last_points.length !== 4){
+          throw new Error("path parse error: T can not find Q!");
+        }
+        var tx = 2 * last_points[2] - last_points[0],
+          ty = 2 * last_points[3] - last_points[1];
+        points.unshift(ty);
+        points.unshift(tx);
+      }
+      if(type == 'S'){
+        if(last_points.length !== 6){
+          throw new Error('path parse error: S can not find C!');
+        }
+        var tx = 2 * last_points[4] - last_points[2],
+          ty = 2 * last_points[5] - last_points[3];
+        points.unshift(ty);
+        points.unshift(tx);
       }
       tem = {
         type: order2func[type],
@@ -441,7 +475,7 @@ Cpath.include({
 
     for(;i<len;i++){
       step = json[i];
-      ctx[step.type].apply(ctx, step.points)
+      ctx[step.type].apply(ctx, step.points);
       if(step.type == 'closePath'){
         if(cfg.lineWidth != 0){
           ctx.stroke();
