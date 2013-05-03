@@ -25,7 +25,6 @@ end
 class File_maker
   attr_accessor :content, :api_doc
   def format_api_doc
-    isUsage = false
     #取出公共api的注释（不包含private）
     @api_doc = @content.scan(/\/\*![^Private][^*]*\*+(?:[^*\/][^*]*\*+)*\//)
     @api_doc.map!{|line|

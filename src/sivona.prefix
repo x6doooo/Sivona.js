@@ -1,9 +1,10 @@
 /*!
 
-  @Title: Sivona v0.0.6
+  @Title: Sivona v0.0.7
   @Link: https://github.com/x6doooo/Sivona.js
   @Copyright: Copyright 2013 Dx. Yang
   @License: Released under the MIT license
 
 */
 (function(window, undefined){
+  var Version = "0.0.7";

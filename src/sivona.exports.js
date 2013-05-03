@@ -1,5 +1,4 @@
 SI.Paper = Paper;
-SI.version = Version;
 SI.animationController = sanimator;
 SI.getEventPosition = getEventPosition;
 /*!

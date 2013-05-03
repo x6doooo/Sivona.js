@@ -7,13 +7,14 @@
 
 */
 (function(window, undefined){
+  var Version = "0.0.6";
 //type
 var toString = {}.toString;
 function isUndefined(v){return typeof v == 'undefined';}
 function isDefined(v){return typeof v !== 'undefined';}
 function isString(v){return typeof v == 'string';}
 function isNumber(v){return typeof v == 'number';}
-function isDate(v){return typeof v === 'true';}
+function isDate(v){return toString.call(v) == '[object Date]';}
 function isObject(v){return v !== null && toString.call(v) == '[object Object]';}
 function isArray(v){return toString.call(v) == '[object Array]';}
 function isFunction(v){return typeof v == 'function';}
@@ -25,8 +26,8 @@ function isEmptyObject(v){
   }
   return true;
 }
-function to_i(v){return ~~v;}
-function to_f(v){return parseFloat(v);}
+function to_i(v){return ~~v;}   //不如直接写
+function to_f(v){return parseFloat(v);} //不如直接写
 function to_s(v){return v + ''};
 function to_a(obj){return [].slice.call(obj, 0);}
 function toFixed(nu, pos){
@@ -269,8 +270,7 @@ function rgb2hex(r, g, b) {
     }
     return v;
   }
-}var Version = "0.0.6",
-  /*!
+}  /*!
     @Name: SI
     @Info: Sivona.js的命名空间，以及新画布的构造函数
     @Type: Namespace & Method
@@ -286,7 +286,7 @@ function rgb2hex(r, g, b) {
     |  var paper = SI('div1', 100, 200);
     |  paper.rect(...);
   */
-  SI = function(id, w, h, t, l){
+var SI = function(id, w, h, t, l){
     return new SI.Paper(id, w, h, t, l);
   },
   _uniqId = 0;
@@ -331,6 +331,7 @@ EvArray.include({
           oldPos = el.oldPos;
           el.translate(nowPos.x - oldPos.x, nowPos.y - oldPos.y);
           el.oldPos = nowPos;
+          el.paper.render();
         }
         if(v.handle) v.handle.call(v.target, e);
       }
@@ -784,6 +785,7 @@ Paper.include({
       - t {Number} 清空区域的左上角y坐标
       - w {Number} 清空区域的宽度
       - h {Number} 清空区域的高度
+      - 无参数时清空整个画布
       @Usage:
       | //从（10,10）坐标开始清空100*100的区域
       | paper.clear(10, 10, 100, 100)
@@ -1153,8 +1155,7 @@ Matrix.include({
       m2 = m[2],
       m3 = m[3],
       m4 = m[4],
-      m5 = m[5],
-      m6 = m[6];
+      m5 = m[5];
     self.matrix = [
       m0 * a + m2 * b,
       m1 * a + m3 * b,
@@ -1397,7 +1398,7 @@ Celement.include({
       if(v[0] == self) a.splice(i, 1);
     });
     domEvents.forEach(function(event){
-      self['un'+event]();
+      self['un' + event]();
     });
   }
 });

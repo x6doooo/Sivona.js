@@ -1,4 +1,3 @@
-var Version = "0.0.6",
   /*!
     @Name: SI
     @Info: Sivona.js的命名空间，以及新画布的构造函数
@@ -15,7 +14,7 @@ var Version = "0.0.6",
     |  var paper = SI('div1', 100, 200);
     |  paper.rect(...);
   */
-  SI = function(id, w, h, t, l){
+var SI = function(id, w, h, t, l){
     return new SI.Paper(id, w, h, t, l);
   },
   _uniqId = 0;
