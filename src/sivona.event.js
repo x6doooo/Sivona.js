@@ -35,6 +35,7 @@ EvArray.include({
           oldPos = el.oldPos;
           el.translate(nowPos.x - oldPos.x, nowPos.y - oldPos.y);
           el.oldPos = nowPos;
+          el.paper.render();
         }
         if(v.handle) v.handle.call(v.target, e);
       }
